@@ -1,955 +1,930 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b0e14">
+<meta name="theme-color" content="#080b14">
 <title>ShadowOS</title>
 
 <style>
-:root {
-  --bg:#0b0e14;
-  --panel:rgba(19,24,34,.94);
-  --panel2:#171e2b;
-  --line:rgba(190,205,230,.13);
-  --text:#edf2fb;
-  --muted:#96a2b7;
-  --accent:#9bb7ed;
-  --shadow:0 24px 70px #0009;
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+:root{
+  --accent:#8295ff;
+  --glass:rgba(15,20,35,.82);
+  --line:rgba(255,255,255,.12);
+  --text:#f4f6ff;
+  --muted:#9ba5bc;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;font-size:14px}
-button,input,textarea{font:inherit}
+body{
+  margin:0;
+  font-family:Inter,"Segoe UI",Arial,sans-serif;
+  color:var(--text);
+  background:#080b14;
+  overflow:hidden;
+}
+button,input{font:inherit}
 button{cursor:pointer;color:inherit}
-
 #desktop{
   position:fixed;inset:0;
   background:
-  radial-gradient(ellipse at 18% 20%,#283958 0,transparent 38%),
-  radial-gradient(ellipse at 80% 78%,#172c35 0,transparent 40%),
-  linear-gradient(135deg,#101722,#080b11 70%);
-  background-size:cover;background-position:center;overflow:hidden;
+    linear-gradient(90deg,rgba(5,8,18,.38),rgba(5,8,18,.08)),
+    url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=3840&q=90")
+    center/cover no-repeat;
+  transition:background .3s;
 }
-.desktop-brand{position:absolute;top:30px;left:34px;pointer-events:none}
-.desktop-brand strong{font-size:13px;letter-spacing:.28em}
-.desktop-brand small{display:block;color:#aab7cc;margin-top:6px;font-size:10px;letter-spacing:.08em}
-
-#desktopIcons{position:absolute;top:92px;left:25px;display:grid;gap:10px}
+#desktop:after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(3,6,15,.08),rgba(3,6,15,.28));
+  pointer-events:none;
+}
+#desktop-content{position:absolute;inset:0;z-index:1}
+#desktop-brand{
+  position:absolute;right:25px;bottom:83px;
+  color:rgba(255,255,255,.5);
+  font-size:10px;letter-spacing:2px;
+  text-align:right;pointer-events:none;
+}
+#desktop-icons{
+  position:absolute;top:22px;left:18px;
+  display:grid;grid-template-columns:repeat(2,76px);
+  gap:14px;
+}
 .desk-icon{
-  border:0;background:transparent;width:76px;padding:9px 4px;
-  border-radius:12px;display:grid;justify-items:center;gap:7px;color:white;
+  width:76px;padding:9px 4px;
+  border:1px solid transparent;border-radius:12px;
+  background:transparent;text-align:center;
+  font-size:11px;color:white;
 }
-.desk-icon:hover{background:#ffffff12}
-.desk-icon svg{width:28px;height:28px}
-.desk-icon span{font-size:11px}
+.desk-icon:hover{background:#ffffff20;border-color:#ffffff20}
+.desk-icon .emoji{font-size:27px;display:block;margin-bottom:7px}
 
+/* Dashboard */
+#dashboard{
+  position:absolute;right:22px;top:22px;
+  width:min(340px,calc(100vw - 150px));
+  display:grid;gap:12px;
+}
+.widget{
+  background:rgba(9,14,28,.55);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:18px;padding:17px;
+  backdrop-filter:blur(22px);
+  box-shadow:0 12px 40px #0002;
+}
+.widget-label{
+  color:var(--muted);font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;
+}
+.clock{
+  font-size:43px;font-weight:300;
+  letter-spacing:-2px;margin-top:5px;
+}
+.date{color:#c1c9dc;font-size:12px;margin-top:3px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{
+  padding:12px;background:#ffffff09;
+  border:1px solid #ffffff0c;border-radius:13px;
+}
+.stat strong{display:block;font-size:19px;margin-top:8px}
+.stat small{font-size:10px;color:var(--muted)}
+.progress{
+  height:5px;background:#ffffff18;
+  border-radius:10px;margin-top:10px;overflow:hidden;
+}
+.progress i{display:block;height:100%;background:var(--accent);width:50%}
+#quick-weather{font-size:13px;margin-top:10px;color:#dce2f4}
+
+/* Taskbar */
 #taskbar{
-  position:absolute;z-index:900;left:50%;bottom:13px;
-  transform:translateX(-50%);height:58px;max-width:calc(100% - 22px);
-  width:max-content;display:flex;align-items:center;gap:6px;padding:7px 10px;
-  background:rgba(12,16,24,.86);border:1px solid #ffffff20;
-  border-radius:18px;box-shadow:0 12px 35px #0008;
-  backdrop-filter:blur(24px);
+  position:absolute;bottom:12px;left:50%;
+  transform:translateX(-50%);
+  min-height:57px;padding:7px 12px;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(10,14,26,.78);
+  border:1px solid var(--line);
+  border-radius:18px;backdrop-filter:blur(25px);
+  box-shadow:0 12px 45px #0005;
+  z-index:9000;max-width:calc(100vw - 20px);
 }
-.task-app,.start-button{
-  height:42px;min-width:42px;border:0;border-radius:12px;
-  background:transparent;display:grid;place-items:center;position:relative;
+.task-btn{
+  width:42px;height:42px;border:0;
+  border-radius:12px;background:transparent;
+  font-size:20px;
 }
-.task-app svg,.start-button svg{width:21px;height:21px}
-.task-app:hover,.start-button:hover{background:#ffffff14}
-.task-app.active:after{
-  content:"";position:absolute;bottom:2px;width:13px;height:3px;
-  border-radius:5px;background:var(--accent);
+.task-btn:hover,.task-btn.active{background:#ffffff1c}
+#task-divider{height:27px;width:1px;background:var(--line)}
+#tray{
+  position:absolute;right:15px;bottom:85px;
+  display:flex;align-items:center;gap:13px;
+  color:white;font-size:12px;
+  z-index:9001;text-shadow:0 2px 8px #000;
 }
-.task-divider{height:28px;width:1px;background:#ffffff20;margin:0 3px}
-.status{display:flex;align-items:center;gap:9px;padding:0 9px;color:#c7d2e5;font-size:11px}
-.status button{border:0;background:none;padding:4px}
-.status svg{width:15px;height:15px;vertical-align:middle}
-.clock{font-size:11px;line-height:1.3;text-align:right}
-.clock b{display:block;font-size:12px;color:white}
+#tray button{background:none;border:0;font-size:15px}
+#tray-clock{text-align:right;line-height:1.5}
 
-#startMenu,#quickPanel{
-  position:absolute;z-index:950;background:rgba(15,20,30,.96);
-  border:1px solid var(--line);border-radius:20px;
-  box-shadow:var(--shadow);backdrop-filter:blur(24px);display:none;
-}
-#startMenu{
+/* Panels */
+.panel{
+  display:none;position:absolute;z-index:8000;
   bottom:82px;left:50%;transform:translateX(-50%);
-  width:min(430px,calc(100% - 24px));padding:18px;
+  width:min(390px,calc(100vw - 24px));
+  padding:18px;border:1px solid var(--line);
+  border-radius:20px;background:rgba(12,17,31,.94);
+  backdrop-filter:blur(28px);box-shadow:0 15px 50px #0006;
 }
-#startMenu.show,#quickPanel.show{display:block}
-.start-head{display:flex;justify-content:space-between;margin-bottom:15px}
-.start-head strong{letter-spacing:.13em;font-size:12px}
-.search,.field{
-  width:100%;background:#0b1019;border:1px solid var(--line);
-  border-radius:9px;padding:10px;color:white;outline:none;
+.panel.show{display:block}
+.panel h3{margin:0 0 15px;font-size:15px}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.panel button,.menu-item{
+  background:#ffffff0c;border:1px solid #ffffff10;
+  border-radius:12px;padding:12px;text-align:left;
 }
-.app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}
-.app-tile{
-  border:0;background:transparent;border-radius:12px;padding:12px 4px;
-  display:grid;justify-items:center;gap:8px;font-size:11px;
+.panel button:hover,.menu-item:hover{background:#ffffff20}
+#start-menu{
+  left:50%;bottom:82px;transform:translateX(-50%);
+  width:min(440px,calc(100vw - 20px));
 }
-.app-tile:hover{background:#ffffff10}
-.app-tile svg{width:25px;height:25px}
+#start-search{
+  width:100%;padding:12px 14px;
+  border:1px solid var(--line);border-radius:12px;
+  color:white;background:#ffffff0c;outline:none;
+  margin-bottom:14px;
+}
+#start-apps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.menu-item{text-align:center;font-size:11px}
+.menu-item span{display:block;font-size:24px;margin-bottom:7px}
 
-#quickPanel{right:15px;bottom:82px;width:280px;padding:15px}
-.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.quick-grid button{
-  padding:12px 8px;border:1px solid var(--line);
-  border-radius:10px;background:#ffffff0a;text-align:left;font-size:11px;
-}
-
+/* Windows */
 .window{
-  position:absolute;z-index:20;min-width:280px;min-height:190px;
-  width:590px;height:410px;max-width:calc(100vw - 20px);
-  max-height:calc(100dvh - 95px);
-  background:rgba(17,22,32,.97);border:1px solid #ffffff20;
-  border-radius:15px;box-shadow:var(--shadow);
-  backdrop-filter:blur(22px);overflow:hidden;display:flex;flex-direction:column;
+  position:absolute;top:100px;left:150px;
+  width:650px;height:440px;
+  min-width:290px;min-height:220px;
+  display:flex;flex-direction:column;
+  background:rgba(13,18,32,.94);
+  border:1px solid #ffffff25;
+  border-radius:15px;overflow:hidden;
+  box-shadow:0 25px 90px #0008;
+  backdrop-filter:blur(25px);
+  z-index:100;
 }
-.window.focused{border-color:#a8c1ed66;box-shadow:0 25px 75px #000a}
 .window.maximized{
-  left:10px!important;top:10px!important;
-  width:calc(100vw - 20px)!important;
-  height:calc(100dvh - 91px)!important;
+  top:8px!important;left:8px!important;
+  width:calc(100% - 16px)!important;
+  height:calc(100% - 92px)!important;
 }
 .titlebar{
-  height:43px;flex:0 0 43px;display:flex;align-items:center;
-  justify-content:space-between;padding:0 12px 0 15px;
-  background:#ffffff06;border-bottom:1px solid var(--line);
-  cursor:grab;touch-action:none;user-select:none;
+  height:43px;flex-shrink:0;
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:0 12px;background:#ffffff08;
+  border-bottom:1px solid #ffffff12;
+  cursor:move;user-select:none;
 }
-.titlebar:active{cursor:grabbing}
-.window-title{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:650}
-.window-title svg{width:16px;height:16px;color:#c1d2f1}
-.win-actions{display:flex;gap:5px}
-.win-actions button{
-  border:0;background:transparent;width:25px;height:25px;
-  border-radius:7px;color:#aebbd0;
+.window-title{font-size:12px;font-weight:600}
+.window-actions{display:flex;gap:6px}
+.window-actions button{
+  border:0;background:#ffffff0c;
+  width:27px;height:26px;border-radius:7px;
 }
-.win-actions button:hover{background:#ffffff16}
-.win-actions .close:hover{background:#a94350;color:white}
-.window-content{flex:1;min-height:0;overflow:auto;padding:16px}
+.window-actions button:hover{background:#ffffff25}
+.window-actions .close:hover{background:#bd465a}
+.window-body{flex:1;overflow:auto;padding:17px}
 .resize-handle{
-  position:absolute;right:0;bottom:0;width:17px;height:17px;
-  cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,#a9bde355 50%);
-  touch-action:none;
+  position:absolute;right:0;bottom:0;
+  width:18px;height:18px;cursor:nwse-resize;
+}
+.resize-handle:after{
+  content:"";position:absolute;right:5px;bottom:5px;
+  width:7px;height:7px;border-right:2px solid #ffffff55;
+  border-bottom:2px solid #ffffff55;
+}
+.app-card{
+  padding:15px;background:#ffffff09;
+  border:1px solid #ffffff10;border-radius:13px;
+}
+.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.app-card button,.primary{
+  background:var(--accent);color:#080b14;
+  border:0;border-radius:8px;padding:8px 12px;
+  font-weight:600;font-size:11px;margin-top:10px;
+}
+input,textarea,select{
+  background:#ffffff0c;border:1px solid var(--line);
+  color:white;border-radius:9px;padding:10px;outline:none;
+}
+input::placeholder,textarea::placeholder{color:#9ba5bc}
+.app-input{width:100%;margin:7px 0}
+.muted{color:var(--muted);font-size:12px}
+.section-title{font-size:13px;margin:0 0 13px}
+.list-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 5px;border-bottom:1px solid #ffffff12;font-size:12px;
 }
 
-.panel{background:#ffffff08;border:1px solid var(--line);border-radius:12px;padding:13px}
-.muted{color:var(--muted)}
-.row{display:flex;align-items:center;gap:9px}
-.between{justify-content:space-between}
-.primary{
-  background:#9bb7ed;color:#111927;border:0;
-  border-radius:9px;padding:9px 13px;font-weight:650;
+/* Calculator */
+#calc-display{
+  width:100%;height:65px;text-align:right;
+  font-size:29px;margin-bottom:12px;
 }
-.secondary{
-  background:#ffffff0d;color:#e8eef9;border:1px solid var(--line);
-  border-radius:9px;padding:8px 11px;
-}
-.section-title{font-size:11px;letter-spacing:.13em;color:#9daec8;text-transform:uppercase}
-
-.calc{max-width:360px;margin:auto}
-.calc-screen{
-  background:#0b1018;border:1px solid var(--line);border-radius:12px;
-  padding:16px;text-align:right;margin-bottom:12px;min-height:92px;
-}
-.calc-expression{color:#91a0b8;font-size:13px;min-height:20px;overflow-wrap:anywhere}
-.calc-value{font-size:31px;font-weight:550;overflow-wrap:anywhere}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .calc-grid button{
-  height:54px;border:1px solid #ffffff0d;border-radius:10px;
-  background:#ffffff0a;font-size:17px;
+  border:1px solid #ffffff12;background:#ffffff0d;
+  border-radius:12px;padding:16px 5px;font-size:17px;
 }
-.calc-grid button:hover{background:#ffffff18}
-.calc-grid .op{color:#c3d6fa;background:#9bb7ed18}
-.calc-grid .equal{background:#9bb7ed;color:#101827}
+.calc-grid button:hover{background:#ffffff25}
+.calc-grid .operator{color:#aebcff;background:#8295ff20}
+.calc-grid .equal{background:var(--accent);color:#080b14}
 
-.file-layout{display:grid;grid-template-columns:145px 1fr;gap:13px;height:100%}
-.file-side{border-right:1px solid var(--line);padding-right:10px}
-.file-side button{
-  display:block;width:100%;text-align:left;border:0;background:transparent;
-  padding:9px;border-radius:8px;color:#aebbd0;font-size:12px;
+/* Browser */
+.browser-bar{display:flex;gap:7px;margin-bottom:12px}
+.browser-bar input{flex:1;min-width:0}
+.browser-frame{width:100%;height:calc(100% - 50px);border:0;border-radius:8px;background:white}
+
+/* Store */
+.store-icon{font-size:27px;margin-bottom:9px}
+#toast{
+  position:absolute;right:18px;top:18px;
+  z-index:99999;padding:13px 17px;
+  border:1px solid var(--line);border-radius:12px;
+  background:#121a2c;color:white;font-size:12px;
+  opacity:0;transform:translateY(-10px);
+  transition:.25s;pointer-events:none;
 }
-.file-side button:hover{background:#ffffff10;color:white}
-.file-main{min-width:0}
-.file-tools{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
-.file-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px}
-.file-item{
-  background:#ffffff08;border:1px solid var(--line);
-  border-radius:10px;padding:12px 8px;text-align:center;min-width:0;
-}
-.file-item svg{width:25px;height:25px;color:#b9cbed}
-.file-item div{font-size:11px;margin-top:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#toast.show{opacity:1;transform:translateY(0)}
+#context-note{font-size:10px;color:var(--muted);margin-top:15px}
 
-.store-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
-.store-card{padding:13px;border:1px solid var(--line);background:#ffffff07;border-radius:12px}
-.store-icon{
-  width:38px;height:38px;border-radius:11px;background:#9bb7ed18;
-  display:grid;place-items:center;margin-bottom:10px;
-}
-.store-icon svg{width:22px;height:22px;color:#c8d9f8}
-.store-card p{color:var(--muted);font-size:11px;min-height:30px}
-
-.browser-top{display:flex;gap:7px;margin-bottom:10px}
-.browser-top input{flex:1;min-width:0}
-.browser-frame{width:100%;height:calc(100% - 48px);border:1px solid var(--line);border-radius:10px;background:white}
-
-.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.wall{height:85px;border:2px solid transparent;border-radius:10px;cursor:pointer}
-.wall.selected{border-color:#d7e5ff;box-shadow:0 0 0 2px #819fd7}
-
-.toast{
-  position:absolute;z-index:1200;right:18px;top:18px;
-  background:#182131;border:1px solid var(--line);border-radius:12px;
-  padding:12px 16px;box-shadow:var(--shadow);font-size:12px;
-}
 @media(max-width:650px){
-  .desktop-brand{top:18px;left:18px}
-  #desktopIcons{top:75px;left:8px;grid-template-columns:repeat(2,72px)}
-  .window{
-    left:8px!important;top:65px!important;
-    width:calc(100vw - 16px)!important;
-    height:calc(100dvh - 150px)!important;
-    max-width:none;max-height:none;
-  }
-  .window.maximized{top:8px!important;height:calc(100dvh - 91px)!important}
-  .status{gap:6px;padding:0 4px}
-  .status .optional{display:none}
-  #taskbar{bottom:7px;height:54px;padding:5px 7px;gap:3px}
-  .task-app,.start-button{min-width:36px;height:38px}
-  .clock{font-size:9px}
-  .clock b{font-size:10px}
-  .file-layout{grid-template-columns:95px 1fr}
-  .file-side button{font-size:10px;padding:8px 5px}
-  .window-content{padding:12px}
+  #dashboard{width:165px;right:10px;top:10px}
+  .widget{padding:11px;border-radius:13px}
+  .clock{font-size:29px}
+  .stats{grid-template-columns:1fr}
+  .stat{padding:8px}
+  .stat strong{font-size:15px}
+  #desktop-icons{grid-template-columns:repeat(2,65px);left:8px;top:10px}
+  .desk-icon{width:65px;font-size:10px}
+  .window{left:5px;top:65px;width:calc(100% - 10px);height:calc(100% - 155px)}
+  #tray{right:10px;bottom:83px}
+  #desktop-brand{right:12px;bottom:145px;font-size:8px}
 }
 </style>
 </head>
 
 <body>
 <div id="desktop">
+<div id="desktop-content">
 
-  <div class="desktop-brand">
-    <strong>SHADOW<span style="color:#9bb7ed">OS</span></strong>
-    <small>PERSONAL DESKTOP ENVIRONMENT</small>
+  <div id="desktop-icons">
+    <button class="desk-icon" onclick="openApp('files')"><span class="emoji">📁</span>Files</button>
+    <button class="desk-icon" onclick="openApp('browser')"><span class="emoji">🌐</span>Browser</button>
+    <button class="desk-icon" onclick="openApp('calculator')"><span class="emoji">🧮</span>Calculator</button>
+    <button class="desk-icon" onclick="openApp('store')"><span class="emoji">🛍️</span>App Store</button>
+    <button class="desk-icon" onclick="openApp('settings')"><span class="emoji">⚙️</span>Settings</button>
+    <button class="desk-icon" onclick="openApp('terminal')"><span class="emoji">⌨️</span>Terminal</button>
   </div>
 
-  <div id="desktopIcons"></div>
-  <div id="windows"></div>
-
-  <div id="startMenu">
-    <div class="start-head">
-      <strong>SHADOWOS APPLICATIONS</strong>
-      <span class="muted">v1.0</span>
+  <div id="dashboard">
+    <div class="widget">
+      <div class="widget-label">SHADOWOS / LOCAL TIME</div>
+      <div class="clock" id="big-clock">00:00</div>
+      <div class="date" id="big-date">Loading date...</div>
     </div>
-    <input id="appSearch" class="search" placeholder="Search applications..." oninput="filterApps(this.value)">
-    <div class="app-grid" id="appGrid"></div>
+
+    <div class="widget">
+      <div class="widget-label">SYSTEM OVERVIEW</div>
+      <div class="stats" style="margin-top:12px">
+        <div class="stat">
+          <small>MEMORY</small>
+          <strong id="memory-stat">--</strong>
+          <div class="progress"><i id="memory-bar"></i></div>
+        </div>
+        <div class="stat">
+          <small>NETWORK</small>
+          <strong id="network-stat">Online</strong>
+          <div class="progress"><i id="network-bar"></i></div>
+        </div>
+      </div>
+      <div id="quick-weather">🌐 Weather widget: connect a weather API to show live weather.</div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-label">QUICK ACCESS</div>
+      <div class="panel-grid" style="margin-top:12px">
+        <button onclick="openApp('calendar')">📅 Calendar</button>
+        <button onclick="openApp('music')">🎵 Music</button>
+        <button onclick="openApp('gallery')">🖼️ Gallery</button>
+        <button onclick="openApp('monitor')">📊 Monitor</button>
+      </div>
+    </div>
   </div>
 
-  <div id="quickPanel">
-    <div class="row between" style="margin-bottom:13px">
-      <b>Quick Settings</b>
-      <span class="muted" id="quickDate"></span>
-    </div>
-    <div class="quick-grid">
-      <button onclick="toast('Network connected')">◉ Network<br><small class="muted">Connected</small></button>
-      <button onclick="toggleTheme()">◐ Appearance<br><small class="muted">Dark mode</small></button>
-      <button onclick="toast('Focus assist enabled')">☾ Focus assist</button>
-      <button onclick="toast('Bluetooth is unavailable in this browser')">ᛒ Bluetooth</button>
-    </div>
-    <p class="muted" style="font-size:11px">Volume</p>
-    <input type="range" min="0" max="100" value="65" style="width:100%">
-  </div>
-
-  <div id="taskbar">
-    <button class="start-button" title="Start" onclick="toggleStart()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
-      </svg>
-    </button>
-
-    <div class="task-divider"></div>
-    <div id="taskApps" class="row"></div>
-    <div class="task-divider"></div>
-
-    <div class="status">
-      <span title="Network">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M3 9a15 15 0 0 1 18 0M6 12a10 10 0 0 1 12 0m-9 3a5 5 0 0 1 6 0m-3 4h.01"/>
-        </svg>
-      </span>
-      <span class="optional" id="pingLabel">-- ms</span>
-      <span class="optional" id="batteryLabel">—%</span>
-      <button title="Quick settings" onclick="toggleQuick()">⌄</button>
-    </div>
-
-    <div class="clock" id="clock">
-      <b>--:--</b>
-      <span>--/--/----</span>
-    </div>
+  <div id="desktop-brand">
+    SHADOW-OS<br>
+    CREATED BY RAFKA PRADITHIYA © 2026
   </div>
 </div>
 
+<div id="tray">
+  <button onclick="togglePanel('quick-panel')" title="Quick settings">◉</button>
+  <span id="network-icon">◉</span>
+  <span id="battery-icon">🔋</span>
+  <div id="tray-clock">
+    <div id="small-clock">00:00</div>
+    <div id="small-date">03/11/2026</div>
+  </div>
+</div>
+
+<div id="quick-panel" class="panel">
+  <h3>Control Center</h3>
+  <div class="panel-grid">
+    <button onclick="toggleNetwork()">🌐 Network</button>
+    <button onclick="toggleTheme()">◐ Appearance</button>
+    <button onclick="openApp('settings')">⚙️ Settings</button>
+    <button onclick="openApp('monitor')">📊 System Monitor</button>
+    <button onclick="openApp('notifications')">🔔 Notifications</button>
+    <button onclick="showToast('ShadowOS is running.')">ⓘ System status</button>
+  </div>
+  <p class="muted" id="network-detail">Network status: online</p>
+</div>
+
+<div id="start-menu" class="panel">
+  <h3>ShadowOS</h3>
+  <input id="start-search" placeholder="Search applications..." oninput="filterApps(this.value)">
+  <div id="start-apps">
+    <button class="menu-item" data-name="files" onclick="openApp('files')"><span>📁</span>Files</button>
+    <button class="menu-item" data-name="browser" onclick="openApp('browser')"><span>🌐</span>Browser</button>
+    <button class="menu-item" data-name="calculator" onclick="openApp('calculator')"><span>🧮</span>Calculator</button>
+    <button class="menu-item" data-name="store" onclick="openApp('store')"><span>🛍️</span>App Store</button>
+    <button class="menu-item" data-name="settings" onclick="openApp('settings')"><span>⚙️</span>Settings</button>
+    <button class="menu-item" data-name="terminal" onclick="openApp('terminal')"><span>⌨️</span>Terminal</button>
+    <button class="menu-item" data-name="calendar" onclick="openApp('calendar')"><span>📅</span>Calendar</button>
+    <button class="menu-item" data-name="gallery" onclick="openApp('gallery')"><span>🖼️</span>Gallery</button>
+    <button class="menu-item" data-name="music" onclick="openApp('music')"><span>🎵</span>Music</button>
+    <button class="menu-item" data-name="monitor" onclick="openApp('monitor')"><span>📊</span>Monitor</button>
+  </div>
+  <div id="context-note">SHADOWOS · PERSONAL DESKTOP ENVIRONMENT</div>
+</div>
+
+<div id="toast"></div>
+
+<div id="taskbar">
+  <button class="task-btn" onclick="togglePanel('start-menu')" title="Start">◈</button>
+  <button class="task-btn" onclick="openApp('files')" title="Files">📁</button>
+  <button class="task-btn" onclick="openApp('browser')" title="Browser">🌐</button>
+  <button class="task-btn" onclick="openApp('calculator')" title="Calculator">🧮</button>
+  <button class="task-btn" onclick="openApp('store')" title="Store">🛍️</button>
+  <span id="task-divider"></span>
+  <div id="task-running" style="display:flex;gap:5px"></div>
+</div>
+</div>
+
 <script>
-const I = {
-files:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10h18"/></svg>`,
-browser:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>`,
-calc:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 6h8M8 11h2m4 0h2m-8 4h2m4 0h2m-8 3h2m4 0h2"/></svg>`,
-store:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8h16l-1 12H5L4 8zM3 8l2-5h14l2 5M9 11v2a3 3 0 0 0 6 0v-2"/></svg>`,
-settings:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.6.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.6-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.9l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.6-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.6.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1-.1 1.8z"/></svg>`,
-music:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 18V5l12-2v13M9 9l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
-gallery:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`,
-terminal:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m5 0h5"/></svg>`,
-calendar:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>`
+const desktop = document.getElementById("desktop");
+let topZ = 100;
+let networkOnline = navigator.onLine;
+let toastTimer;
+
+const apps = {
+  files:{name:"File Explorer",icon:"📁"},
+  browser:{name:"Shadow Browser",icon:"🌐"},
+  calculator:{name:"Calculator",icon:"🧮"},
+  store:{name:"App Store",icon:"🛍️"},
+  settings:{name:"Settings",icon:"⚙️"},
+  terminal:{name:"Terminal",icon:"⌨️"},
+  calendar:{name:"Calendar",icon:"📅"},
+  gallery:{name:"Gallery",icon:"🖼️"},
+  music:{name:"Shadow Music",icon:"🎵"},
+  monitor:{name:"System Monitor",icon:"📊"},
+  notifications:{name:"Notifications",icon:"🔔"}
 };
 
-const APPS=[
-  ['files','File Manager'],
-  ['browser','Browser'],
-  ['calc','Calculator'],
-  ['store','App Store'],
-  ['settings','Settings'],
-  ['music','Music'],
-  ['gallery','Gallery'],
-  ['terminal','Terminal'],
-  ['calendar','Calendar']
-];
+const windows = {};
+let fileData = JSON.parse(localStorage.getItem("shadow_files") || "[]");
+let notifications = JSON.parse(localStorage.getItem("shadow_notifications") || "[]");
 
-const winRoot=document.getElementById('windows');
-let z=30,active=null,winCount=0;
-let files=JSON.parse(localStorage.getItem('shadow_files')||'[]');
-let installed=JSON.parse(localStorage.getItem('shadow_apps')||'["files","browser","calc","store","settings"]');
-
-function appIcon(id){return I[id]||I.terminal}
-
-function toast(msg){
-  let t=document.createElement('div');
-  t.className='toast';
-  t.textContent=msg;
-  document.getElementById('desktop').append(t);
-  setTimeout(()=>t.remove(),2600);
+function saveFiles(){
+  localStorage.setItem("shadow_files",JSON.stringify(fileData));
+}
+function showToast(message){
+  const toast=document.getElementById("toast");
+  toast.textContent=message;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove("show"),2600);
+}
+function notify(message){
+  notifications.unshift({message,time:new Date().toLocaleTimeString()});
+  notifications=notifications.slice(0,30);
+  localStorage.setItem("shadow_notifications",JSON.stringify(notifications));
+  showToast(message);
+}
+function togglePanel(id){
+  document.querySelectorAll(".panel").forEach(p=>{
+    if(p.id!==id)p.classList.remove("show");
+  });
+  document.getElementById(id).classList.toggle("show");
+}
+function filterApps(query){
+  document.querySelectorAll("#start-apps .menu-item").forEach(item=>{
+    item.style.display=item.dataset.name.includes(query.toLowerCase())?"block":"none";
+  });
+}
+function toggleNetwork(){
+  networkOnline=!networkOnline;
+  updateNetwork();
+  showToast(networkOnline?"Network indicator enabled":"Network indicator disabled");
+}
+function updateNetwork(){
+  document.getElementById("network-stat").textContent=networkOnline?"Online":"Offline";
+  document.getElementById("network-icon").textContent=networkOnline?"◉":"○";
+  document.getElementById("network-bar").style.width=networkOnline?"100%":"0%";
+  document.getElementById("network-detail").textContent="Network status: "+(networkOnline?"online":"offline");
+}
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  showToast("Appearance preference toggled");
 }
 
-function toggleStart(){
-  document.getElementById('startMenu').classList.toggle('show');
-  document.getElementById('quickPanel').classList.remove('show');
+/* Clock */
+function updateClock(){
+  const now=new Date();
+  const time=now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+  const date=now.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  document.getElementById("big-clock").textContent=time;
+  document.getElementById("small-clock").textContent=time;
+  document.getElementById("big-date").textContent=date;
+  document.getElementById("small-date").textContent=now.toLocaleDateString("id-ID");
 }
+setInterval(updateClock,1000);updateClock();
 
-function toggleQuick(){
-  document.getElementById('quickPanel').classList.toggle('show');
-  document.getElementById('startMenu').classList.remove('show');
-  document.getElementById('quickDate').textContent=new Date().toLocaleDateString('id-ID');
+/* Memory display: browser estimate only */
+async function updateMemory(){
+  if(performance.memory){
+    const used=performance.memory.usedJSHeapSize/1048576;
+    const total=performance.memory.jsHeapSizeLimit/1048576;
+    const percent=Math.min(100,used/total*100);
+    document.getElementById("memory-stat").textContent=Math.round(used)+" MB";
+    document.getElementById("memory-bar").style.width=percent+"%";
+  }else{
+    document.getElementById("memory-stat").textContent="N/A";
+  }
 }
+setInterval(updateMemory,3000);updateMemory();
+window.addEventListener("online",()=>{networkOnline=true;updateNetwork()});
+window.addEventListener("offline",()=>{networkOnline=false;updateNetwork()});
+updateNetwork();
 
-function filterApps(q){renderAppGrid(q.toLowerCase())}
+/* Window manager */
+function createWindow(id){
+  if(windows[id]){
+    const old=windows[id];
+    old.style.display="flex";
+    old.style.zIndex=++topZ;
+    return old;
+  }
 
-function renderAppGrid(q=''){
-  document.getElementById('appGrid').innerHTML=APPS
-    .filter(a=>a[1].toLowerCase().includes(q))
-    .map(a=>`<button class="app-tile" onclick="openApp('${a[0]}');toggleStart()">${appIcon(a[0])}<span>${a[1]}</span></button>`)
-    .join('');
-}
-
-function renderDesktop(){
-  document.getElementById('desktopIcons').innerHTML=APPS.slice(0,5)
-    .map(a=>`<button class="desk-icon" onclick="openApp('${a[0]}')">${appIcon(a[0])}<span>${a[1]}</span></button>`)
-    .join('');
-}
-
-function updateTaskbar(){
-  document.getElementById('taskApps').innerHTML=
-    [...winRoot.querySelectorAll('.window')].map(w=>
-      `<button class="task-app ${w===active?'active':''}" title="${w.dataset.title}" onclick="restoreWindow('${w.id}')">${appIcon(w.dataset.app)}</button>`
-    ).join('');
-}
-
-function focusWindow(w){
-  if(!w)return;
-  active=w;
-  z++;
-  w.style.zIndex=z;
-  document.querySelectorAll('.window').forEach(x=>x.classList.toggle('focused',x===w));
-  updateTaskbar();
-}
-
-function restoreWindow(id){
-  let w=document.getElementById(id);
-  if(w){w.style.display='flex';focusWindow(w)}
-}
-
-function createWindow(app,title,content,width=590,height=410){
-  let old=[...winRoot.querySelectorAll('.window')].find(w=>w.dataset.app===app);
-  if(old){restoreWindow(old.id);return old}
-
-  let w=document.createElement('section');
-  w.className='window';
-  w.id='win'+(++winCount);
-  w.dataset.app=app;
-  w.dataset.title=title;
-
-  w.style.width=`min(${width}px,calc(100vw - 20px))`;
-  w.style.height=`min(${height}px,calc(100dvh - 100px))`;
-  w.style.left=Math.max(12,Math.min(innerWidth-width-12,100+winCount*24))+'px';
-  w.style.top=Math.max(12,Math.min(innerHeight-height-90,65+winCount*20))+'px';
-
-  w.innerHTML=`
-    <header class="titlebar">
-      <div class="window-title">${appIcon(app)}<span>${title}</span></div>
-      <div class="win-actions">
-        <button title="Minimize" onclick="minimizeWindow('${w.id}')">−</button>
-        <button title="Maximize" onclick="maximizeWindow('${w.id}')">□</button>
-        <button class="close" title="Close" onclick="closeWindow('${w.id}')">×</button>
+  const win=document.createElement("section");
+  win.className="window";
+  win.dataset.app=id;
+  win.style.zIndex=++topZ;
+  win.innerHTML=`
+    <div class="titlebar">
+      <span class="window-title">${apps[id].icon} ${apps[id].name}</span>
+      <div class="window-actions">
+        <button data-action="minimize">—</button>
+        <button data-action="maximize">□</button>
+        <button data-action="close" class="close">×</button>
       </div>
-    </header>
-    <div class="window-content">${content}</div>
+    </div>
+    <div class="window-body"></div>
     <div class="resize-handle"></div>
   `;
+  document.getElementById("desktop-content").appendChild(win);
+  windows[id]=win;
 
-  winRoot.append(w);
-  focusWindow(w);
-  makeDraggable(w);
-  makeResizable(w);
-  return w;
+  win.addEventListener("pointerdown",()=>win.style.zIndex=++topZ);
+
+  win.querySelector('[data-action="close"]').onclick=()=>{
+    win.remove();delete windows[id];updateRunning();
+  };
+  win.querySelector('[data-action="minimize"]').onclick=()=>{
+    win.style.display="none";updateRunning();
+  };
+  win.querySelector('[data-action="maximize"]').onclick=()=>{
+    win.classList.toggle("maximized");
+  };
+
+  makeDraggable(win);
+  makeResizable(win);
+  updateRunning();
+  return win;
 }
-
-function closeWindow(id){
-  let w=document.getElementById(id);
-  if(w)w.remove();
-  active=[...winRoot.querySelectorAll('.window')].pop()||null;
-  if(active)focusWindow(active);
-  else updateTaskbar();
-}
-
-function minimizeWindow(id){
-  let w=document.getElementById(id);
-  if(w)w.style.display='none';
-  active=null;
-  updateTaskbar();
-}
-
-function maximizeWindow(id){
-  let w=document.getElementById(id);
-  if(!w)return;
-
-  if(w.classList.contains('maximized')){
-    w.classList.remove('maximized');
-    w.style.left=w.dataset.left;
-    w.style.top=w.dataset.top;
-    w.style.width=w.dataset.width;
-    w.style.height=w.dataset.height;
-  }else{
-    w.dataset.left=w.style.left;
-    w.dataset.top=w.style.top;
-    w.dataset.width=w.style.width;
-    w.dataset.height=w.style.height;
-    w.classList.add('maximized');
-  }
-  focusWindow(w);
-}
-
-function snapWindow(w,side){
-  w.classList.remove('maximized');
-  w.classList.add('snapped');
-  w.style.top='10px';
-  w.style.height='calc(100dvh - 91px)';
-  w.style.width='calc(50vw - 15px)';
-  w.style.left=side==='left'?'10px':'calc(50vw + 5px)';
-  focusWindow(w);
-}
-
-function makeDraggable(w){
-  let bar=w.querySelector('.titlebar');
-  let sx,sy,l,t,drag=false;
-
-  bar.addEventListener('pointerdown',e=>{
-    if(e.target.closest('button'))return;
-    if(w.classList.contains('maximized'))return;
-    drag=true;
-    focusWindow(w);
-    sx=e.clientX;sy=e.clientY;
-    l=w.offsetLeft;t=w.offsetTop;
+function makeDraggable(win){
+  const bar=win.querySelector(".titlebar");
+  let sx,sy,ox,oy,moving=false;
+  bar.addEventListener("pointerdown",e=>{
+    if(e.target.closest("button"))return;
+    if(win.classList.contains("maximized"))return;
+    moving=true;sx=e.clientX;sy=e.clientY;
+    ox=win.offsetLeft;oy=win.offsetTop;
     bar.setPointerCapture(e.pointerId);
   });
-
-  bar.addEventListener('pointermove',e=>{
-    if(!drag)return;
-    let x=l+e.clientX-sx;
-    let y=t+e.clientY-sy;
-    w.style.left=Math.max(0,Math.min(innerWidth-w.offsetWidth,x))+'px';
-    w.style.top=Math.max(0,Math.min(innerHeight-80,y))+'px';
+  bar.addEventListener("pointermove",e=>{
+    if(!moving)return;
+    win.style.left=Math.max(0,ox+e.clientX-sx)+"px";
+    win.style.top=Math.max(0,oy+e.clientY-sy)+"px";
   });
-
-  bar.addEventListener('pointerup',e=>{
-    if(!drag)return;
-    drag=false;
-    if(e.clientX<18)snapWindow(w,'left');
-    else if(e.clientX>innerWidth-18)snapWindow(w,'right');
+  bar.addEventListener("pointerup",e=>{
+    if(!moving)return;
+    moving=false;
+    if(e.clientX<15)snapWindow(win,"left");
+    else if(e.clientX>innerWidth-15)snapWindow(win,"right");
+  });
+}
+function snapWindow(win,side){
+  win.classList.remove("maximized");
+  win.style.top="10px";
+  win.style.width="calc(50% - 15px)";
+  win.style.height="calc(100% - 100px)";
+  win.style.left=side==="left"?"10px":"calc(50% + 5px)";
+}
+function makeResizable(win){
+  const handle=win.querySelector(".resize-handle");
+  let sx,sy,sw,sh,resizing=false;
+  handle.addEventListener("pointerdown",e=>{
+    if(win.classList.contains("maximized"))return;
+    resizing=true;sx=e.clientX;sy=e.clientY;
+    sw=win.offsetWidth;sh=win.offsetHeight;
+    handle.setPointerCapture(e.pointerId);
+    e.stopPropagation();
+  });
+  handle.addEventListener("pointermove",e=>{
+    if(!resizing)return;
+    win.style.width=Math.max(290,sw+e.clientX-sx)+"px";
+    win.style.height=Math.max(220,sh+e.clientY-sy)+"px";
+  });
+  handle.addEventListener("pointerup",()=>resizing=false);
+}
+function updateRunning(){
+  const area=document.getElementById("task-running");
+  area.innerHTML="";
+  Object.entries(windows).forEach(([id,win])=>{
+    const btn=document.createElement("button");
+    btn.className="task-btn";
+    btn.textContent=apps[id].icon;
+    btn.title=apps[id].name;
+    btn.onclick=()=>{
+      win.style.display="flex";
+      win.style.zIndex=++topZ;
+    };
+    area.appendChild(btn);
   });
 }
 
-function makeResizable(w){
-  let h=w.querySelector('.resize-handle');
-
-  h.addEventListener('pointerdown',e=>{
-    e.preventDefault();
-    focusWindow(w);
-
-    let sx=e.clientX,sy=e.clientY;
-    let sw=w.offsetWidth,sh=w.offsetHeight;
-
-    h.setPointerCapture(e.pointerId);
-
-    let move=ev=>{
-      w.style.width=Math.max(280,Math.min(innerWidth-w.offsetLeft,sw+ev.clientX-sx))+'px';
-      w.style.height=Math.max(190,Math.min(innerHeight-w.offsetTop-80,sh+ev.clientY-sy))+'px';
-    };
-
-    let up=()=>{
-      h.removeEventListener('pointermove',move);
-      h.removeEventListener('pointerup',up);
-    };
-
-    h.addEventListener('pointermove',move);
-    h.addEventListener('pointerup',up);
-  });
-}
-
+/* App launcher */
 function openApp(id){
-  let title=(APPS.find(a=>a[0]===id)||[id,id])[1];
-  let body='';
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("show"));
+  const win=createWindow(id);
+  const body=win.querySelector(".window-body");
+  if(win.dataset.initialized==="true")return;
+  win.dataset.initialized="true";
 
-  if(id==='calc')body=calcHTML();
-  if(id==='files')body=fileHTML();
-  if(id==='browser')body=browserHTML();
-  if(id==='store')body=storeHTML();
-  if(id==='settings')body=settingsHTML();
-
-  if(id==='terminal')body=terminalHTML();
-
-  if(id==='calendar'){
-    body=`<h2>Calendar</h2><div class="panel">
-      <h1>${new Date().toLocaleDateString('id-ID',{day:'numeric'})}</h1>
-      <b>${new Date().toLocaleDateString('id-ID',{weekday:'long',month:'long',year:'numeric'})}</b>
-    </div>`;
-  }
-
-  if(id==='music'){
-    body=`<div style="text-align:center;padding:35px">
-      <div style="font-size:48px">♫</div>
-      <h2>Shadow Music</h2>
-      <p class="muted">Your local music workspace</p>
-      <input type="file" accept="audio/*" id="audioFile" class="field">
-      <audio id="audioPlayer" controls style="width:100%;margin-top:20px"></audio>
-    </div>`;
-  }
-
-  if(id==='gallery'){
-    body=`<h2>Gallery</h2>
-      <p class="muted">Open images from your device.</p>
-      <input type="file" accept="image/*" multiple class="field" onchange="previewImages(this)">
-      <div id="galleryPreview" class="store-grid" style="margin-top:12px"></div>`;
-  }
-
-  let w=createWindow(id,title,body,id==='calc'?370:600,id==='calc'?480:440);
-
-  if(id==='calc')initCalc(w);
-  if(id==='files')initFiles(w);
-  if(id==='browser')initBrowser(w);
-  if(id==='store')initStore(w);
-  if(id==='settings')initSettings(w);
-  if(id==='terminal')initTerminal(w);
-
-  if(id==='music'){
-    let inp=w.querySelector('#audioFile');
-    inp.onchange=()=>{
-      let a=w.querySelector('#audioPlayer');
-      a.src=URL.createObjectURL(inp.files[0]);
-    };
-  }
-
-  return w;
+  if(id==="calculator")initCalculator(body);
+  if(id==="files")initFiles(body);
+  if(id==="browser")initBrowser(body);
+  if(id==="store")initStore(body);
+  if(id==="settings")initSettings(body);
+  if(id==="terminal")initTerminal(body);
+  if(id==="calendar")initCalendar(body);
+  if(id==="gallery")initGallery(body);
+  if(id==="music")initMusic(body);
+  if(id==="monitor")initMonitor(body);
+  if(id==="notifications")initNotifications(body);
 }
 
-/* CALCULATOR */
-
-function calcHTML(){
-  return `<div class="calc">
-    <div class="calc-screen">
-      <div class="calc-expression" id="calcExpr"></div>
-      <div class="calc-value" id="calcValue">0</div>
-    </div>
+/* Calculator */
+function initCalculator(body){
+  body.innerHTML=`
+    <input id="calc-display" value="0" readonly>
     <div class="calc-grid">
-      ${['AC','±','%','÷','7','8','9','×','4','5','6','−','1','2','3','+','0','.','⌫','=']
-        .map((x,i)=>`<button class="${[3,7,11,15].includes(i)?'op':''} ${x==='='?'equal':''}" data-key="${x}">${x}</button>`)
-        .join('')}
-    </div>
-  </div>`;
-}
-
-function initCalc(w){
-  let v='0',expr='';
-  const val=w.querySelector('#calcValue');
-  const ex=w.querySelector('#calcExpr');
-
-  function press(k){
-    if(k==='AC'){v='0';expr=''}
-    else if(k==='⌫'){v=v.length>1?v.slice(0,-1):'0'}
-    else if(k==='='){
-      try{
-        let s=(expr+v).replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
-        if(!/^[0-9+\-*/%.() ]+$/.test(s))throw 0;
-        let n=Function('"use strict";return ('+s+')')();
-        if(!Number.isFinite(n))throw 0;
-        expr=s+' =';
-        v=String(Number(n.toPrecision(11)));
-      }catch{
-        expr='Invalid expression';
-        v='0';
+      ${["AC","⌫","%","÷","7","8","9","×","4","5","6","−","1","2","3","+","±","0",".","="].map(x=>
+        `<button class="${["÷","×","−","+","="].includes(x)?"operator":""} ${x==="="?"equal":""}" data-key="${x}">${x}</button>`
+      ).join("")}
+    </div>`;
+  const display=body.querySelector("#calc-display");
+  let expression="";
+  body.querySelectorAll("[data-key]").forEach(btn=>{
+    btn.onclick=()=>{
+      const key=btn.dataset.key;
+      if(key==="AC"){expression="";display.value="0";return}
+      if(key==="⌫"){expression=expression.slice(0,-1);display.value=expression||"0";return}
+      if(key==="±"){expression=expression.startsWith("-")?expression.slice(1):"-"+expression;display.value=expression;return}
+      if(key==="="){
+        try{
+          const safe=expression.replace(/×/g,"*").replace(/÷/g,"/").replace(/−/g,"-");
+          if(!/^[0-9+\-*/%.() ]+$/.test(safe))throw Error();
+          const result=Function('"use strict";return ('+safe+')')();
+          if(!Number.isFinite(result))throw Error();
+          expression=String(Number(result.toFixed(8)));
+          display.value=expression;
+        }catch{display.value="Error";expression=""}
+        return;
       }
-    }
-    else if(['+','−','×','÷','%'].includes(k)){expr+=v+k;v='0'}
-    else if(k==='±'){v=String(-Number(v))}
-    else if(k==='.' ){if(!v.includes('.'))v+='.'}
-    else{v=v==='0'?k:v+k}
-
-    val.textContent=v;
-    ex.textContent=expr;
-  }
-
-  w.querySelectorAll('[data-key]').forEach(b=>{
-    b.onclick=()=>press(b.dataset.key);
+      expression+=key;
+      display.value=expression;
+    };
   });
 }
 
-/* FILE MANAGER */
-
-function fileHTML(){
-  return `<div class="file-layout">
-    <aside class="file-side">
-      <p class="section-title">Places</p>
-      <button>⌂ Home</button>
-      <button>▣ Documents</button>
-      <button>▧ Downloads</button>
-      <button>☆ Favorites</button>
-    </aside>
-    <div class="file-main">
-      <div class="file-tools">
-        <button class="secondary" id="newFolder">＋ Folder</button>
-        <button class="secondary" id="newFile">＋ File</button>
-      </div>
-      <div class="file-list" id="fileList"></div>
+/* File Explorer */
+function initFiles(body){
+  body.innerHTML=`
+    <h3 class="section-title">My Files</h3>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="primary" id="new-file">＋ New file</button>
+      <button class="primary" id="new-folder">＋ New folder</button>
     </div>
-  </div>`;
-}
-
-function initFiles(w){
-  let list=w.querySelector('#fileList');
-
-  function draw(){
-    list.innerHTML=files.map((f,i)=>`
-      <div class="file-item" data-i="${i}">
-        ${I.files}
-        <div>${escapeHTML(f.name)}</div>
-        <small class="muted">${f.type}</small>
-      </div>
-    `).join('')||'<p class="muted">This folder is empty.</p>';
-
-    list.querySelectorAll('.file-item').forEach(el=>{
-      el.onclick=()=>{
-        let f=files[+el.dataset.i];
-        if(f.type==='File'){
-          let name=prompt('Edit file',f.name);
-          if(name!==null){
-            f.name=name;
-            save();
-            draw();
-          }
-        }else toast(f.name+' opened');
-      };
+    <div id="file-list" style="margin-top:15px"></div>`;
+  const list=body.querySelector("#file-list");
+  function render(){
+    list.innerHTML=fileData.length?fileData.map((f,i)=>`
+      <div class="list-row">
+        <span>${f.type==="folder"?"📁":"📄"} ${escapeHTML(f.name)}</span>
+        <span>
+          <button data-open="${i}">Open</button>
+          <button data-rename="${i}">Rename</button>
+          <button data-delete="${i}">×</button>
+        </span>
+      </div>`).join(""):'<p class="muted">This folder is empty.</p>';
+    list.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{
+      const f=fileData[+b.dataset.open];
+      if(f.type==="folder"){showToast("Folder opened: "+f.name);return}
+      const content=prompt("Edit file content:",f.content||"");
+      if(content!==null){f.content=content;saveFiles();showToast("File saved")}
+    });
+    list.querySelectorAll("[data-rename]").forEach(b=>b.onclick=()=>{
+      const f=fileData[+b.dataset.rename];
+      const name=prompt("New name:",f.name);
+      if(name){f.name=name;saveFiles();render()}
+    });
+    list.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>{
+      if(confirm("Delete this item?")){fileData.splice(+b.dataset.delete,1);saveFiles();render()}
     });
   }
-
-  function save(){
-    localStorage.setItem('shadow_files',JSON.stringify(files));
-  }
-
-  w.querySelector('#newFolder').onclick=()=>{
-    let n=prompt('Folder name');
-    if(n){files.push({name:n,type:'Folder'});save();draw()}
+  body.querySelector("#new-file").onclick=()=>{
+    const name=prompt("File name:");
+    if(name){fileData.push({name,type:"file",content:""});saveFiles();render()}
   };
-
-  w.querySelector('#newFile').onclick=()=>{
-    let n=prompt('File name');
-    if(n){files.push({name:n,type:'File'});save();draw()}
+  body.querySelector("#new-folder").onclick=()=>{
+    const name=prompt("Folder name:");
+    if(name){fileData.push({name,type:"folder"});saveFiles();render()}
   };
-
-  draw();
+  render();
 }
 
-/* BROWSER */
-
-function browserHTML(){
-  return `<div class="browser-top">
-    <input id="browserAddress" class="field" placeholder="Enter website address">
-    <button class="primary" id="browserGo">Go</button>
-    <button class="secondary" id="browserExternal">↗</button>
-  </div>
-  <iframe class="browser-frame" id="browserFrame"
-    sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
-    referrerpolicy="no-referrer"></iframe>
-  <p class="muted" style="font-size:10px">
-    Some websites block embedded viewing. Use ↗ to open them in a new tab.
-  </p>`;
-}
-
-function initBrowser(w){
-  let input=w.querySelector('#browserAddress');
-  let frame=w.querySelector('#browserFrame');
-
-  function go(){
-    let u=input.value.trim();
-    if(!u)return;
-    if(!/^https?:\/\//i.test(u))u='https://'+u;
-
-    try{
-      let url=new URL(u);
-      if(!['http:','https:'].includes(url.protocol))throw 0;
-      input.value=url.href;
-      frame.src=url.href;
-    }catch{toast('Invalid address')}
-  }
-
-  w.querySelector('#browserGo').onclick=go;
-  input.onkeydown=e=>{if(e.key==='Enter')go()};
-
-  w.querySelector('#browserExternal').onclick=()=>{
-    let u=input.value.trim();
-    if(u)window.open(/^https?:\/\//i.test(u)?u:'https://'+u,'_blank','noopener,noreferrer');
-  };
-
-  input.value='https://example.com';
-}
-
-/* APP STORE */
-
-function storeHTML(){
-  return `<h2 style="margin-top:0">Discover applications</h2>
-    <p class="muted">A small collection for your workspace.</p>
-    <div class="store-grid" id="storeGrid"></div>`;
-}
-
-const STORE=[
-  ['music','Shadow Music','A simple local audio player.'],
-  ['gallery','Gallery','Browse images from your device.'],
-  ['terminal','Terminal','A lightweight command interface.'],
-  ['calendar','Calendar','Date and day overview.']
-];
-
-function initStore(w){
-  let g=w.querySelector('#storeGrid');
-
-  g.innerHTML=STORE.map(a=>`
-    <div class="store-card">
-      <div class="store-icon">${appIcon(a[0])}</div>
-      <b>${a[1]}</b>
-      <p>${a[2]}</p>
-      <button class="secondary" data-id="${a[0]}">
-        ${installed.includes(a[0])?'Open':'Install'}
-      </button>
-    </div>
-  `).join('');
-
-  g.querySelectorAll('button').forEach(b=>{
-    b.onclick=()=>{
-      let id=b.dataset.id;
-      if(!installed.includes(id)){
-        installed.push(id);
-        localStorage.setItem('shadow_apps',JSON.stringify(installed));
-        b.textContent='Open';
-        toast('App installed');
-      }else openApp(id);
-    };
-  });
-}
-
-/* SETTINGS */
-
-function settingsHTML(){
-  return `<h2 style="margin-top:0">Personalization</h2>
-    <p class="muted">Choose a desktop atmosphere.</p>
-    <div class="settings-grid">
-      <div class="panel">
-        <div class="wall selected" data-wall="0" style="background:radial-gradient(at 20% 20%,#344b70,#111722 65%)"></div>
-        <small>Midnight Blue</small>
-      </div>
-      <div class="panel">
-        <div class="wall" data-wall="1" style="background:radial-gradient(at 80% 20%,#315b55,#101b1d 65%)"></div>
-        <small>Deep Forest</small>
-      </div>
-      <div class="panel">
-        <div class="wall" data-wall="2" style="background:radial-gradient(at 50% 80%,#55416d,#171321 65%)"></div>
-        <small>Violet Dusk</small>
-      </div>
-      <div class="panel">
-        <div class="wall" data-wall="3" style="background:linear-gradient(135deg,#303946,#0c1016)"></div>
-        <small>Graphite</small>
-      </div>
-    </div>
-    <p class="section-title" style="margin-top:20px">Interface</p>
-    <button class="secondary" onclick="toast('Dark appearance is active')">Dark appearance</button>
-    <p class="muted" style="font-size:11px;margin-top:20px">
-      ShadowOS 1.0 · Browser-based desktop
-    </p>`;
-}
-
-function initSettings(w){
-  let walls=[
-    'radial-gradient(ellipse at 18% 20%,#283958 0,transparent 38%),radial-gradient(ellipse at 80% 78%,#172c35 0,transparent 40%),linear-gradient(135deg,#101722,#080b11 70%)',
-    'radial-gradient(ellipse at 80% 20%,#315b55,transparent 45%),linear-gradient(135deg,#101b1d,#080d12)',
-    'radial-gradient(ellipse at 50% 80%,#55416d,transparent 50%),linear-gradient(135deg,#171321,#090b12)',
-    'linear-gradient(135deg,#303946,#0c1016)'
-  ];
-
-  w.querySelectorAll('.wall').forEach(el=>{
-    el.onclick=()=>{
-      w.querySelectorAll('.wall').forEach(x=>x.classList.remove('selected'));
-      el.classList.add('selected');
-      document.getElementById('desktop').style.background=walls[+el.dataset.wall];
-      localStorage.setItem('shadow_wall',el.dataset.wall);
-    };
-  });
-}
-
-/* TERMINAL */
-
-function terminalHTML(){
-  return `<div style="font-family:ui-monospace,monospace">
-    <p style="color:#9bb7ed">ShadowOS Terminal [browser simulation]</p>
-    <p class="muted">Type <b>help</b> to view available commands.</p>
-    <div id="termOut"></div>
-    <div class="row">
-      <span style="color:#9bb7ed">user@shadow:~$</span>
-      <input id="termInput" style="flex:1;background:transparent;border:0;color:white;outline:0">
-    </div>
-  </div>`;
-}
-
-function initTerminal(w){
-  let input=w.querySelector('#termInput');
-  let out=w.querySelector('#termOut');
-  input.focus();
-
-  input.onkeydown=e=>{
-    if(e.key!=='Enter')return;
-    let c=input.value.trim();
-
-    let msg={
-      help:'help · date · clear · apps · version',
-      date:new Date().toString(),
-      apps:APPS.map(a=>a[1]).join(', '),
-      version:'ShadowOS 1.0'
-    }[c]??'Command not found: '+c;
-
-    if(c==='clear')out.innerHTML='';
-    else out.innerHTML+=`<p style="margin:6px 0">
-      <span style="color:#9bb7ed">$ ${escapeHTML(c)}</span><br>
-      ${escapeHTML(msg)}
-    </p>`;
-
-    input.value='';
-  };
-}
-
-/* GALLERY */
-
-function previewImages(inp){
-  let target=document.getElementById('galleryPreview');
-  target.innerHTML='';
-
-  [...inp.files].forEach(f=>{
-    let u=URL.createObjectURL(f);
-    let img=document.createElement('img');
-    img.src=u;
-    img.style.cssText='width:100%;height:120px;object-fit:cover;border-radius:10px';
-    target.append(img);
-  });
-}
-
-function escapeHTML(s){
-  return String(s).replace(/[&<>"']/g,c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+/* Escape user-entered file names */
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[c]));
 }
 
-/* STATUS BAR */
-
-function updateClock(){
-  let d=new Date();
-  document.getElementById('clock').innerHTML=`
-    <b>${d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</b>
-    <span>${d.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'})}</span>
-  `;
+/* Browser */
+function initBrowser(body){
+  body.innerHTML=`
+    <div class="browser-bar">
+      <button id="back">←</button>
+      <button id="reload">↻</button>
+      <input id="browser-url" value="https://example.com" placeholder="Enter website URL">
+      <button id="go" class="primary">Go</button>
+    </div>
+    <iframe class="browser-frame" id="browser-frame" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+    <p class="muted">Some websites block embedded browsing. Use Open externally if a page does not load.</p>
+    <button id="external" class="primary">Open externally ↗</button>`;
+  const url=body.querySelector("#browser-url");
+  const frame=body.querySelector("#browser-frame");
+  const go=()=>{
+    let value=url.value.trim();
+    if(!/^https?:\/\//i.test(value))value="https://"+value;
+    try{new URL(value);frame.src=value;url.value=value}
+    catch{showToast("Invalid address")}
+  };
+  body.querySelector("#go").onclick=go;
+  url.onkeydown=e=>{if(e.key==="Enter")go()};
+  body.querySelector("#reload").onclick=()=>frame.src=frame.src;
+  body.querySelector("#back").onclick=()=>{try{frame.contentWindow.history.back()}catch{}};
+  body.querySelector("#external").onclick=()=>window.open(url.value,"_blank","noopener");
+  go();
 }
 
-async function updatePing(){
-  let label=document.getElementById('pingLabel');
-
-  if(!navigator.onLine){
-    label.textContent='Offline';
-    return;
-  }
-
-  try{
-    let start=performance.now();
-    await fetch(location.href,{method:'HEAD',cache:'no-store'});
-    label.textContent=Math.round(performance.now()-start)+' ms';
-  }catch{
-    label.textContent='Online';
-  }
+/* App Store */
+function initStore(body){
+  const storeApps=[
+    ["🎵","Shadow Music","Local audio player"],
+    ["🖼️","Gallery","View local images"],
+    ["📅","Calendar","Calendar and date"],
+    ["⌨️","Terminal","Command interface"],
+    ["📊","System Monitor","Browser resource overview"],
+    ["🔔","Notifications","System activity"]
+  ];
+  body.innerHTML=`
+    <h3 class="section-title">Discover applications</h3>
+    <div class="app-grid">
+      ${storeApps.map(a=>`
+        <div class="app-card">
+          <div class="store-icon">${a[0]}</div>
+          <strong style="font-size:12px">${a[1]}</strong>
+          <p class="muted">${a[2]}</p>
+          <button data-app="${a[1]}">Open</button>
+        </div>`).join("")}
+    </div>`;
+  body.querySelectorAll("[data-app]").forEach(b=>{
+    const id={
+      "Shadow Music":"music","Gallery":"gallery","Calendar":"calendar",
+      "Terminal":"terminal","System Monitor":"monitor","Notifications":"notifications"
+    }[b.dataset.app];
+    b.onclick=()=>openApp(id);
+  });
 }
 
-async function battery(){
-  if(navigator.getBattery){
-    try{
-      let b=await navigator.getBattery();
-      let set=()=>document.getElementById('batteryLabel').textContent=Math.round(b.level*100)+'%';
-      set();
-      b.addEventListener('levelchange',set);
-    }catch{
-      document.getElementById('batteryLabel').textContent='—';
-    }
-  }else{
-    document.getElementById('batteryLabel').textContent='—';
-  }
+/* Settings */
+function initSettings(body){
+  const wallpapers=[
+    ["Aurora Abstract","https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=3840&q=90"],
+    ["Dark Blue","https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=3840&q=90"],
+    ["Deep Space","https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=3840&q=90"],
+    ["Midnight","https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?auto=format&fit=crop&w=3840&q=90"]
+  ];
+  body.innerHTML=`
+    <h3 class="section-title">Personalization</h3>
+    <p class="muted">Choose your desktop wallpaper.</p>
+    <div class="app-grid">
+      ${wallpapers.map((w,i)=>`
+        <button class="app-card" data-wall="${i}" style="padding:7px">
+          <img src="${w[1]}" alt="${w[0]}" style="width:100%;height:75px;object-fit:cover;border-radius:8px">
+          <p style="font-size:11px">${w[0]}</p>
+        </button>`).join("")}
+    </div>
+    <hr style="border-color:#ffffff15;margin:20px 0">
+    <h3 class="section-title">System identity</h3>
+    <p class="muted">ShadowOS · Hybrid Desktop Experience</p>
+    <p class="muted">Created by Rapka Pradithiya © 2026</p>
+    <button class="primary" id="reset-settings">Reset wallpaper</button>`;
+  body.querySelectorAll("[data-wall]").forEach(b=>{
+    b.onclick=()=>{
+      const url=wallpapers[+b.dataset.wall][1];
+      desktop.style.backgroundImage=`linear-gradient(90deg,#05081255,#05081215),url("${url}")`;
+      localStorage.setItem("shadow_wallpaper",url);
+      showToast("Wallpaper updated");
+    };
+  });
+  body.querySelector("#reset-settings").onclick=()=>{
+    localStorage.removeItem("shadow_wallpaper");
+    desktop.style.backgroundImage="";
+    showToast("Wallpaper reset");
+  };
 }
 
-function toggleTheme(){
-  toast('Dark appearance is active');
+/* Terminal */
+function initTerminal(body){
+  body.innerHTML=`
+    <div style="font:12px monospace;color:#9db4ff;line-height:1.8" id="terminal-output">
+      SHADOWOS TERMINAL [Version 1.1]<br>
+      Type <b>help</b> to see available commands.<br><br>
+    </div>
+    <input class="app-input" id="terminal-input" placeholder="Enter command...">`;
+  const input=body.querySelector("#terminal-input");
+  const output=body.querySelector("#terminal-output");
+  input.onkeydown=e=>{
+    if(e.key!=="Enter")return;
+    const cmd=input.value.trim().toLowerCase();
+    output.innerHTML+="<br>&gt; "+escapeHTML(cmd)+"<br>";
+    const commands={
+      help:"Available: help, date, time, clear, system, apps",
+      date:new Date().toDateString(),
+      time:new Date().toLocaleTimeString(),
+      system:"ShadowOS 1.1 / Browser-based desktop",
+      apps:Object.keys(apps).join(", "),
+      clear:""
+    };
+    if(cmd==="clear")output.innerHTML="";
+    else output.innerHTML+=escapeHTML(commands[cmd]||"Command not found.")+"<br>";
+    input.value="";
+    body.scrollTop=body.scrollHeight;
+  };
 }
 
-window.addEventListener('online',()=>toast('Connection restored'));
-window.addEventListener('offline',()=>toast('You are offline'));
+/* Calendar */
+function initCalendar(body){
+  const now=new Date();
+  const first=new Date(now.getFullYear(),now.getMonth(),1).getDay();
+  const days=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  body.innerHTML=`
+    <h2 style="font-weight:400">${now.toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</h2>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center">
+      ${["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(d=>`<small class="muted">${d}</small>`).join("")}
+      ${Array.from({length:first},()=>"<span></span>").join("")}
+      ${Array.from({length:days},(_,i)=>`
+        <div style="padding:10px 2px;border-radius:8px;background:${i+1===now.getDate()?"#8295ff":"#ffffff0b"};color:${i+1===now.getDate()?"#080b14":"white"}">
+          ${i+1}
+        </div>`).join("")}
+    </div>`;
+}
 
-renderDesktop();
-renderAppGrid();
-updateClock();
-setInterval(updateClock,1000);
-updatePing();
-setInterval(updatePing,30000);
-battery();
+/* Gallery */
+function initGallery(body){
+  body.innerHTML=`
+    <h3 class="section-title">Local Gallery</h3>
+    <p class="muted">Select images from your device. Images are not uploaded.</p>
+    <input type="file" id="gallery-input" accept="image/*" multiple class="app-input">
+    <div id="gallery-grid" class="app-grid"></div>`;
+  const input=body.querySelector("#gallery-input");
+  const grid=body.querySelector("#gallery-grid");
+  input.onchange=()=>{
+    grid.innerHTML="";
+    [...input.files].forEach(file=>{
+      const url=URL.createObjectURL(file);
+      const img=document.createElement("img");
+      img.src=url;img.alt=file.name;
+      img.style="width:100%;height:120px;object-fit:cover;border-radius:10px";
+      grid.appendChild(img);
+    });
+  };
+}
 
-document.addEventListener('pointerdown',e=>{
-  if(!e.target.closest('#startMenu,.start-button')){
-    document.getElementById('startMenu').classList.remove('show');
+/* Music */
+function initMusic(body){
+  body.innerHTML=`
+    <div style="text-align:center;padding:25px">
+      <div style="font-size:65px">🎵</div>
+      <h3>Shadow Music</h3>
+      <p class="muted">Play audio files from your device.</p>
+      <input type="file" id="music-file" accept="audio/*" class="app-input">
+      <audio id="audio-player" controls style="width:100%;margin-top:15px"></audio>
+      <p class="muted" id="music-name">No track selected</p>
+    </div>`;
+  body.querySelector("#music-file").onchange=e=>{
+    const file=e.target.files[0];
+    if(!file)return;
+    body.querySelector("#audio-player").src=URL.createObjectURL(file);
+    body.querySelector("#music-name").textContent=file.name;
+  };
+}
+
+/* System Monitor */
+function initMonitor(body){
+  body.innerHTML=`
+    <h3 class="section-title">System Monitor</h3>
+    <div class="app-grid">
+      <div class="app-card"><small class="muted">Browser memory</small><h2 id="mon-memory">--</h2></div>
+      <div class="app-card"><small class="muted">Network</small><h2 id="mon-network">--</h2></div>
+      <div class="app-card"><small class="muted">Screen</small><h2>${screen.width}×${screen.height}</h2></div>
+      <div class="app-card"><small class="muted">Platform</small><h2 style="font-size:14px">${escapeHTML(navigator.platform||"Browser")}</h2></div>
+    </div>
+    <p class="muted">Resource values are limited to information exposed by your browser. They are not actual device-wide CPU or RAM readings.</p>`;
+  const refresh=()=>{
+    const memory=performance.memory;
+    body.querySelector("#mon-memory").textContent=memory?
+      Math.round(memory.usedJSHeapSize/1048576)+" MB":"Unavailable";
+    body.querySelector("#mon-network").textContent=navigator.onLine?"Online":"Offline";
+  };
+  refresh();
+  const timer=setInterval(()=>{if(!body.isConnected){clearInterval(timer);return}refresh()},3000);
+}
+
+/* Notifications */
+function initNotifications(body){
+  body.innerHTML=`
+    <h3 class="section-title">Notification Center</h3>
+    <button class="primary" id="clear-notifications">Clear history</button>
+    <div id="notification-list" style="margin-top:12px"></div>`;
+  const list=body.querySelector("#notification-list");
+  function render(){
+    list.innerHTML=notifications.length?notifications.map(n=>`
+      <div class="list-row"><span>🔔 ${escapeHTML(n.message)}</span><small class="muted">${escapeHTML(n.time)}</small></div>
+    `).join(""):'<p class="muted">No notifications yet.</p>';
   }
+  body.querySelector("#clear-notifications").onclick=()=>{
+    notifications=[];
+    localStorage.setItem("shadow_notifications","[]");
+    render();
+  };
+  render();
+}
 
-  if(!e.target.closest('#quickPanel,.status button')){
-    document.getElementById('quickPanel').classList.remove('show');
+/* Restore wallpaper */
+const savedWallpaper=localStorage.getItem("shadow_wallpaper");
+if(savedWallpaper){
+  desktop.style.backgroundImage=`linear-gradient(90deg,#05081255,#05081215),url("${savedWallpaper}")`;
+}
+
+/* Close panels when clicking outside */
+document.addEventListener("pointerdown",e=>{
+  if(!e.target.closest(".panel")&&!e.target.closest("#taskbar")&&!e.target.closest("#tray")){
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("show"));
   }
 });
+
+notify("ShadowOS 1.1 initialized");
 </script>
 </body>
 </html>

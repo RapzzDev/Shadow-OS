@@ -145,6 +145,36 @@ textarea{resize:vertical;min-height:180px}
   text-align:left;
 }
 .powerMenu button:hover{background:#2b3a50}
+  .storeSearch{
+  margin-bottom:12px;
+}
+
+.storeCard{
+  background:#202938;
+  border:1px solid #354257;
+  border-radius:8px;
+  padding:13px;
+  margin-bottom:10px;
+}
+
+.storeCard h4{
+  margin:0 0 7px;
+}
+
+.storeCard p{
+  color:#aebbd0;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.storeCard button{
+  margin-top:7px;
+}
+
+.storeStatus{
+  font-size:11px;
+  color:#8fa8c8;
+  }
 </style>
 </head>
 <body>
@@ -162,6 +192,7 @@ textarea{resize:vertical;min-height:180px}
   <div class="icon" onclick="openApp('settings')"><span>⚙️</span>Settings</div>
   <div class="icon" onclick="openApp('about')"><span>◈</span>About</div>
   <div class="icon" onclick="openApp('system')"><span>🖥️</span>System</div>
+  <div class="icon" onclick="openApp('appstore')"><span>🛒</span>App Store</div>
   <div id="wallpaper">SHADOW</div>
 </main>
 
@@ -179,6 +210,7 @@ textarea{resize:vertical;min-height:180px}
   <button onclick="openApp('settings');toggleStart()">⚙️ Settings</button>
   <button onclick="openApp('about');toggleStart()">◈ About</button>
   <button onclick="openApp('system');toggleStart()">🖥️ System</button>
+  <button onclick="openApp('appstore');toggleStart()">🛒 App Store</button>
 </div>
 
 <script>
@@ -238,7 +270,8 @@ function openApp(name){
     calculator:"Calculator",
     settings:"Settings",
     about:"About SHADOW OS",
-    system:"System Information"
+    system:"System Information",
+    appstore:"SHADOW App Store"
   };
 
   const win=document.createElement("section");
@@ -273,6 +306,7 @@ focusWindow(win);
   if(name==="settings")renderSettings();
   if(name==="about")renderAbout();
   if(name==="system")renderSystem();
+  if(name==="appstore")renderAppStore();
 }
 
 function closeApp(name){
@@ -648,7 +682,7 @@ function resetFiles(){
 function renderAbout(){
   document.getElementById("content-about").innerHTML=`
     <h2>◈ SHADOW OS</h2>
-    <p class="note">Version 0.6</p>
+    <p class="note">Version 0.7</p>
     <p class="note">A browser-based virtual desktop environment.</p>
     <p class="note">Created for experimentation and learning.</p>
   `;
@@ -766,7 +800,7 @@ function resetAppearance(){
 
     <div class="systemCard">
       <h4>SHADOW OS</h4>
-      <p>Version: 0.6</p>
+      <p>Version: 0.7</p>
       <p>Platform: Web Browser</p>
       <p>Status: Running</p>
     </div>
@@ -842,6 +876,249 @@ function restartShadow(){
   document.getElementById("powerMenu")?.remove();
 
   showNotification("SHADOW OS","Tampilan berhasil dimulai ulang.");
+  }
+  // ===================================
+// SHADOW OS v0.7 - VIRTUAL APP STORE
+// ===================================
+
+const STORE_KEY="shadow_os_installed_apps";
+
+const storeApps=[
+  {
+    id:"music",
+    name:"Shadow Music",
+    icon:"🎵",
+    category:"Entertainment",
+    description:"Pemutar musik virtual SHADOW OS."
+  },
+  {
+    id:"gallery",
+    name:"Shadow Gallery",
+    icon:"🖼️",
+    category:"Media",
+    description:"Galeri untuk melihat koleksi gambar virtual."
+  },
+  {
+    id:"weather",
+    name:"Shadow Weather",
+    icon:"🌦️",
+    category:"Utility",
+    description:"Tampilan informasi cuaca simulasi."
+  },
+  {
+    id:"terminal",
+    name:"Shadow Terminal",
+    icon:"💻",
+    category:"System",
+    description:"Terminal perintah virtual."
+  },
+  {
+    id:"calendar",
+    name:"Shadow Calendar",
+    icon:"📅",
+    category:"Productivity",
+    description:"Kalender sederhana."
+  },
+  {
+    id:"games",
+    name:"Shadow Games",
+    icon:"🎮",
+    category:"Entertainment",
+    description:"Pusat permainan virtual."
+  }
+];
+
+function loadInstalledApps(){
+  try{
+    const data=JSON.parse(localStorage.getItem(STORE_KEY));
+    return Array.isArray(data)?data:[];
+  }catch(e){
+    return [];
+  }
+}
+
+let installedApps=loadInstalledApps();
+
+function saveInstalledApps(){
+  localStorage.setItem(
+    STORE_KEY,
+    JSON.stringify(installedApps)
+  );
+}
+
+function renderAppStore(){
+  const content=document.getElementById("content-appstore");
+  if(!content)return;
+
+  content.innerHTML=`
+    <h3>🛒 SHADOW App Store</h3>
+    <p class="note">Discover virtual applications for your system.</p>
+
+    <input
+      class="storeSearch"
+      id="storeSearch"
+      placeholder="Search applications..."
+      oninput="filterStoreApps()"
+    >
+
+    <div id="storeAppList"></div>
+
+    <p class="note">
+      Installed Applications: <strong id="installedCount">0</strong>
+    </p>
+  `;
+
+  filterStoreApps();
+}
+
+function filterStoreApps(){
+  const search=document.getElementById("storeSearch");
+  const list=document.getElementById("storeAppList");
+
+  if(!search||!list)return;
+
+  const keyword=search.value.toLowerCase();
+
+  const results=storeApps.filter(app=>
+    app.name.toLowerCase().includes(keyword)||
+    app.category.toLowerCase().includes(keyword)||
+    app.description.toLowerCase().includes(keyword)
+  );
+
+  list.innerHTML="";
+
+  if(results.length===0){
+    list.innerHTML='<div class="empty">No applications found.</div>';
+  }
+
+  results.forEach(app=>{
+    const installed=installedApps.includes(app.id);
+
+    const card=document.createElement("div");
+    card.className="storeCard";
+
+    const title=document.createElement("h4");
+    title.textContent=app.icon+" "+app.name;
+
+    const category=document.createElement("div");
+    category.className="storeStatus";
+    category.textContent=app.category;
+
+    const description=document.createElement("p");
+    description.textContent=app.description;
+
+    const button=document.createElement("button");
+    button.className="action";
+
+    if(installed){
+      button.textContent="✓ Installed";
+      button.onclick=()=>openStoreApp(app.id);
+    }else{
+      button.textContent="＋ Install";
+      button.onclick=()=>installStoreApp(app.id);
+    }
+
+    const uninstall=document.createElement("button");
+    uninstall.className="action";
+    uninstall.textContent="Uninstall";
+    uninstall.style.marginLeft="7px";
+    uninstall.disabled=!installed;
+    uninstall.style.opacity=installed?"1":"0.4";
+    uninstall.onclick=()=>uninstallStoreApp(app.id);
+
+    card.append(title,category,description,button,uninstall);
+    list.appendChild(card);
+  });
+
+  document.getElementById("installedCount").textContent=
+    installedApps.length;
+}
+
+function installStoreApp(id){
+  const app=storeApps.find(a=>a.id===id);
+  if(!app||installedApps.includes(id))return;
+
+  installedApps.push(id);
+  saveInstalledApps();
+  filterStoreApps();
+
+  showNotification(
+    "App Store",
+    app.name+" berhasil diinstal."
+  );
+}
+
+function uninstallStoreApp(id){
+  const app=storeApps.find(a=>a.id===id);
+  if(!app||!installedApps.includes(id))return;
+
+  if(!confirm("Uninstall "+app.name+"?"))return;
+
+  installedApps=installedApps.filter(x=>x!==id);
+  saveInstalledApps();
+
+  document.getElementById("window-storeapp-"+id)?.remove();
+
+  filterStoreApps();
+  updateTaskbar();
+
+  showNotification(
+    "App Store",
+    app.name+" berhasil diuninstall."
+  );
+}
+
+function openStoreApp(id){
+  if(!installedApps.includes(id))return;
+
+  const app=storeApps.find(a=>a.id===id);
+  if(!app)return;
+
+  const windowId="window-storeapp-"+id;
+  const old=document.getElementById(windowId);
+
+  if(old){
+    focusWindow(old);
+    return;
+  }
+
+  const win=document.createElement("section");
+  win.className="window";
+  win.id=windowId;
+  win.style.zIndex=++highestZ;
+
+  win.innerHTML=`
+    <div class="titlebar">
+      <strong>${app.icon} ${app.name}</strong>
+      <div class="controls">
+        <button onclick="minimizeApp('storeapp-${id}')">−</button>
+        <button onclick="maximizeApp('storeapp-${id}')">□</button>
+        <button class="close" onclick="closeApp('storeapp-${id}')">×</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <h3>${app.icon} ${app.name}</h3>
+      <p class="note">${app.description}</p>
+      <div class="systemCard">
+        <h4>Application Status</h4>
+        <p>Installed successfully.</p>
+        <p>SHADOW OS Virtual Application</p>
+      </div>
+      <p class="note">
+        This application is currently a virtual demonstration.
+      </p>
+    </div>
+  `;
+
+  desktop.appendChild(win);
+
+  win.addEventListener("pointerdown",()=>{
+    focusWindow(win);
+  });
+
+  focusWindow(win);
+  dragWindow(win);
   }
 updateClock();
 setInterval(updateClock,1000);

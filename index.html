@@ -1,0 +1,540 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101010">
+<title>SHADOW OS</title>
+
+<style>
+:root {
+    --bg: #101010;
+    --panel: #1b1b1b;
+    --border: #383838;
+    --text: #eeeeee;
+    --muted: #999999;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    user-select: none;
+}
+
+button {
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.desktop {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 75% 30%, #292929, transparent 40%),
+        linear-gradient(145deg, #171717, #090909);
+}
+
+/* TOPBAR */
+
+.topbar {
+    height: 55px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ffffff12;
+    background: #11111155;
+}
+
+.brand {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
+
+.status {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* DESKTOP ICONS */
+
+.desktop-icons {
+    position: absolute;
+    top: 85px;
+    left: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 85px);
+    gap: 20px 10px;
+}
+
+.icon-button {
+    width: 85px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: transparent;
+    color: #cccccc;
+    font-size: 11px;
+}
+
+.icon-button:active {
+    background: #ffffff12;
+}
+
+.glyph {
+    width: 45px;
+    height: 45px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #454545;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #292929, #171717);
+    font-size: 20px;
+}
+
+/* WALLPAPER TEXT */
+
+.wallpaper-title {
+    position: absolute;
+    right: 7%;
+    top: 40%;
+    text-align: right;
+    pointer-events: none;
+    color: #ffffff20;
+}
+
+.wallpaper-title strong {
+    display: block;
+    font-size: clamp(30px, 8vw, 75px);
+    letter-spacing: 10px;
+}
+
+.wallpaper-title span {
+    color: #ffffff55;
+    font-size: 10px;
+    letter-spacing: 4px;
+}
+
+/* TASKBAR */
+
+.taskbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    border-top: 1px solid #ffffff18;
+    background: #151515ed;
+    backdrop-filter: blur(15px);
+}
+
+.task-left {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.start-button,
+.task-app {
+    min-height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #242424;
+}
+
+.start-button {
+    padding: 0 15px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.task-app {
+    width: 40px;
+    font-size: 17px;
+}
+
+.clock {
+    text-align: right;
+    font-size: 12px;
+}
+
+.clock small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* START MENU */
+
+.start-menu {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    bottom: 75px;
+    left: 12px;
+    width: min(320px, calc(100vw - 24px));
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: #1b1b1b;
+    box-shadow: 0 15px 50px #000a;
+}
+
+.start-menu.open {
+    display: block;
+}
+
+.menu-title {
+    margin-bottom: 15px;
+    font-size: 12px;
+    letter-spacing: 3px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.menu-item {
+    min-height: 75px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: #292929;
+    font-size: 10px;
+}
+
+.menu-item b {
+    font-size: 20px;
+    font-weight: normal;
+}
+
+/* APPLICATION WINDOW */
+
+.window {
+    display: none;
+    position: absolute;
+    z-index: 5;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    width: min(500px, calc(100vw - 28px));
+    min-height: 240px;
+    overflow: hidden;
+    border: 1px solid #444;
+    border-radius: 14px;
+    background: #1b1b1b;
+    box-shadow: 0 20px 70px #000a;
+}
+
+.window.open {
+    display: block;
+}
+
+.window-header {
+    height: 48px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #333;
+    background: #222;
+}
+
+.window-title {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.window-actions {
+    display: flex;
+    gap: 7px;
+}
+
+.window-actions button {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #444;
+    border-radius: 7px;
+    background: #303030;
+}
+
+.window-body {
+    min-height: 190px;
+    padding: 20px;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.window-body h2 {
+    margin-bottom: 8px;
+    font-size: 19px;
+}
+
+.window-body p {
+    color: var(--muted);
+}
+
+.card {
+    margin-top: 18px;
+    padding: 14px;
+    border: 1px solid #383838;
+    border-radius: 10px;
+    background: #222;
+}
+
+@media (max-width: 520px) {
+    .desktop-icons {
+        left: 10px;
+        grid-template-columns: repeat(2, 75px);
+        gap: 12px 5px;
+    }
+
+    .icon-button {
+        width: 75px;
+    }
+
+    .wallpaper-title {
+        top: 45%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main class="desktop">
+
+    <header class="topbar">
+        <div class="brand">SHADOW OS</div>
+        <div class="status">● SYSTEM ONLINE</div>
+    </header>
+
+    <section class="desktop-icons">
+
+        <button class="icon-button" data-app="computer">
+            <span class="glyph">▣</span>
+            My Computer
+        </button>
+
+        <button class="icon-button" data-app="notes">
+            <span class="glyph">▤</span>
+            Notes
+        </button>
+
+        <button class="icon-button" data-app="settings">
+            <span class="glyph">⚙</span>
+            Settings
+        </button>
+
+        <button class="icon-button" data-app="about">
+            <span class="glyph">◈</span>
+            About
+        </button>
+
+    </section>
+
+    <div class="wallpaper-title">
+        <strong>SHADOW</strong>
+        <span>YOUR DIGITAL SPACE</span>
+    </div>
+
+    <section class="start-menu" id="startMenu">
+        <div class="menu-title">SHADOW MENU</div>
+
+        <div class="menu-grid">
+            <button class="menu-item" data-app="computer">
+                <b>▣</b>Computer
+            </button>
+
+            <button class="menu-item" data-app="notes">
+                <b>▤</b>Notes
+            </button>
+
+            <button class="menu-item" data-app="settings">
+                <b>⚙</b>Settings
+            </button>
+
+            <button class="menu-item" data-app="about">
+                <b>◈</b>About
+            </button>
+        </div>
+    </section>
+
+    <section class="window" id="appWindow">
+
+        <div class="window-header">
+            <div class="window-title" id="windowTitle">
+                APPLICATION
+            </div>
+
+            <div class="window-actions">
+                <button id="minimizeBtn">−</button>
+                <button id="closeBtn">×</button>
+            </div>
+        </div>
+
+        <div class="window-body" id="windowBody"></div>
+
+    </section>
+
+    <footer class="taskbar">
+
+        <div class="task-left">
+            <button class="start-button" id="startBtn">
+                ◈ START
+            </button>
+
+            <button class="task-app" data-app="computer">▣</button>
+            <button class="task-app" data-app="notes">▤</button>
+        </div>
+
+        <div class="clock">
+            <div id="clock">00:00</div>
+            <small id="date">Loading...</small>
+        </div>
+
+    </footer>
+
+</main>
+
+<script>
+const startMenu = document.getElementById("startMenu");
+const appWindow = document.getElementById("appWindow");
+const windowTitle = document.getElementById("windowTitle");
+const windowBody = document.getElementById("windowBody");
+
+const apps = {
+    computer: {
+        title: "MY COMPUTER",
+        body: `
+            <h2>My Computer</h2>
+            <p>Virtual storage system.</p>
+            <div class="card">
+                📁 This PC<br>
+                <small>File Manager coming soon.</small>
+            </div>
+        `
+    },
+
+    notes: {
+        title: "NOTES",
+        body: `
+            <h2>Notes</h2>
+            <p>Your personal workspace.</p>
+            <div class="card">
+                📝 Notes application coming soon.
+            </div>
+        `
+    },
+
+    settings: {
+        title: "SETTINGS",
+        body: `
+            <h2>System Settings</h2>
+            <p>Customize Shadow OS.</p>
+            <div class="card">
+                ⚙ Appearance<br>
+                <small>More settings coming soon.</small>
+            </div>
+        `
+    },
+
+    about: {
+        title: "ABOUT SHADOW OS",
+        body: `
+            <h2>SHADOW OS</h2>
+            <p>Browser-based desktop environment.</p>
+            <div class="card">
+                VERSION 0.1<br>
+                BUILD 001<br>
+                STATUS: DEVELOPMENT
+            </div>
+        `
+    }
+};
+
+function openApp(name) {
+    const app = apps[name];
+
+    if (!app) return;
+
+    windowTitle.textContent = app.title;
+    windowBody.innerHTML = app.body;
+
+    startMenu.classList.remove("open");
+    appWindow.classList.add("open");
+}
+
+function closeApp() {
+    appWindow.classList.remove("open");
+}
+
+document.querySelectorAll("[data-app]").forEach(button => {
+    button.addEventListener("click", () => {
+        openApp(button.dataset.app);
+    });
+});
+
+document.getElementById("startBtn").addEventListener("click", () => {
+    startMenu.classList.toggle("open");
+    appWindow.classList.remove("open");
+});
+
+document.getElementById("closeBtn").addEventListener("click", closeApp);
+document.getElementById("minimizeBtn").addEventListener("click", closeApp);
+
+function updateClock() {
+    const now = new Date();
+
+    document.getElementById("clock").textContent =
+        now.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+    document.getElementById("date").textContent =
+        now.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+
+</body>
+</html>

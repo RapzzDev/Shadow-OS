@@ -102,6 +102,49 @@ textarea{resize:vertical;min-height:180px}
 .settingGroup input{
   width:100%;
   }
+  .systemCard{
+  background:#202938;
+  border:1px solid #354257;
+  border-radius:7px;
+  padding:13px;
+  margin:10px 0;
+}
+.systemCard h4{margin:0 0 8px}
+.systemCard p{font-size:12px;color:#bdc9d8}
+.toast{
+  position:absolute;
+  right:15px;
+  top:15px;
+  z-index:200;
+  background:#202b3b;
+  border:1px solid #52647d;
+  padding:13px;
+  border-radius:7px;
+  width:min(260px,80%);
+  font-size:12px;
+  box-shadow:0 8px 25px #0008;
+}
+.powerMenu{
+  position:absolute;
+  z-index:150;
+  bottom:48px;
+  right:10px;
+  background:#182130;
+  border:1px solid #39475b;
+  border-radius:8px;
+  padding:10px;
+  width:190px;
+}
+.powerMenu button{
+  display:block;
+  width:100%;
+  padding:10px;
+  color:white;
+  background:transparent;
+  border:0;
+  text-align:left;
+}
+.powerMenu button:hover{background:#2b3a50}
 </style>
 </head>
 <body>
@@ -118,6 +161,7 @@ textarea{resize:vertical;min-height:180px}
   <div class="icon" onclick="openApp('calculator')"><span>🧮</span>Calculator</div>
   <div class="icon" onclick="openApp('settings')"><span>⚙️</span>Settings</div>
   <div class="icon" onclick="openApp('about')"><span>◈</span>About</div>
+  <div class="icon" onclick="openApp('system')"><span>🖥️</span>System</div>
   <div id="wallpaper">SHADOW</div>
 </main>
 
@@ -134,6 +178,7 @@ textarea{resize:vertical;min-height:180px}
   <button onclick="openApp('calculator');toggleStart()">🧮 Calculator</button>
   <button onclick="openApp('settings');toggleStart()">⚙️ Settings</button>
   <button onclick="openApp('about');toggleStart()">◈ About</button>
+  <button onclick="openApp('system');toggleStart()">🖥️ System</button>
 </div>
 
 <script>
@@ -193,6 +238,7 @@ function openApp(name){
     calculator:"Calculator",
     settings:"Settings",
     about:"About SHADOW OS"
+    system:"System Information"
   };
 
   const win=document.createElement("section");
@@ -226,6 +272,7 @@ focusWindow(win);
   if(name==="calculator")renderCalculator();
   if(name==="settings")renderSettings();
   if(name==="about")renderAbout();
+  if(name==="system")renderSystem();
 }
 
 function closeApp(name){
@@ -703,7 +750,99 @@ function resetAppearance(){
   localStorage.removeItem("shadow_appearance");
   loadAppearance();
   }
-  
+  function renderSystem(){
+  const content=document.getElementById("content-system");
+
+  const used=new Blob([
+    JSON.stringify(files),
+    localStorage.getItem("shadow_notes")||"",
+    localStorage.getItem("shadow_appearance")||""
+  ]).size;
+
+  const kb=(used/1024).toFixed(2);
+
+  content.innerHTML=`
+    <h3>🖥️ System Information</h3>
+
+    <div class="systemCard">
+      <h4>SHADOW OS</h4>
+      <p>Version: 0.6</p>
+      <p>Platform: Web Browser</p>
+      <p>Status: Running</p>
+    </div>
+
+    <div class="systemCard">
+      <h4>💾 Virtual Storage</h4>
+      <p>Stored data: ${kb} KB</p>
+      <p>Virtual files: ${files.length}</p>
+      <p>Storage type: Browser Local Storage</p>
+    </div>
+
+    <div class="systemCard">
+      <h4>⚙️ System Actions</h4>
+      <button class="action" onclick="showNotification('SHADOW OS','System berjalan normal.')">
+        Test Notification
+      </button>
+      <button class="action" onclick="clearTemporaryData()">
+        Clear Temporary Data
+      </button>
+      <button class="action" onclick="showPowerMenu()">
+        Power Options
+      </button>
+    </div>
+  `;
+}
+
+function showNotification(title,message){
+  document.getElementById("systemToast")?.remove();
+
+  const toast=document.createElement("div");
+  toast.id="systemToast";
+  toast.className="toast";
+
+  const heading=document.createElement("strong");
+  heading.textContent=title;
+
+  const body=document.createElement("p");
+  body.textContent=message;
+
+  toast.append(heading,body);
+  desktop.appendChild(toast);
+
+  setTimeout(()=>toast.remove(),3500);
+}
+
+function clearTemporaryData(){
+  if(!confirm("Bersihkan data sementara SHADOW OS?"))return;
+
+  showNotification("System Cleaner","Tidak ada data sementara yang perlu dibersihkan.");
+}
+
+function showPowerMenu(){
+  document.getElementById("powerMenu")?.remove();
+
+  const menu=document.createElement("div");
+  menu.id="powerMenu";
+  menu.className="powerMenu";
+
+  menu.innerHTML=`
+    <button onclick="restartShadow()">↻ Restart SHADOW OS</button>
+    <button onclick="showNotification('Power','SHADOW OS masih berjalan di browser.')">⏻ Shut Down</button>
+    <button onclick="document.getElementById('powerMenu').remove()">Cancel</button>
+  `;
+
+  desktop.appendChild(menu);
+}
+
+function restartShadow(){
+  if(!confirm("Restart tampilan SHADOW OS?"))return;
+
+  document.querySelectorAll(".window").forEach(win=>win.remove());
+  currentPath=[];
+  document.getElementById("powerMenu")?.remove();
+
+  showNotification("SHADOW OS","Tampilan berhasil dimulai ulang.");
+  }
 updateClock();
 setInterval(updateClock,1000);
 </script>

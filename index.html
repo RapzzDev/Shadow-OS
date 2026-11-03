@@ -258,9 +258,8 @@ function getFolder(id){
 function openApp(name){
   const old=document.getElementById("window-"+name);
   if(old){
-    old.classList.remove("hidden");
-    old.style.zIndex=++highestZ;
-    return;
+  focusWindow(old);
+  return;
   }
 
   const titles={

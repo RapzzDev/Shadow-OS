@@ -77,6 +77,31 @@ textarea{resize:vertical;min-height:180px}
   border-color:#7189aa;
   box-shadow:0 15px 45px #000b;
        }
+  .wallpaper-blue{
+  background:radial-gradient(ellipse at 70% 70%,#142b48,#070b13 70%)!important;
+}
+.wallpaper-purple{
+  background:radial-gradient(ellipse at 70% 70%,#302044,#090710 70%)!important;
+}
+.wallpaper-red{
+  background:radial-gradient(ellipse at 70% 70%,#421b25,#10080b 70%)!important;
+}
+.wallpaper-black{
+  background:radial-gradient(ellipse at 70% 70%,#181818,#050505 70%)!important;
+}
+.settingGroup{
+  padding:12px 0;
+  border-bottom:1px solid #30394a;
+}
+.settingGroup label{
+  display:block;
+  font-size:13px;
+  margin-bottom:8px;
+}
+.settingGroup select,
+.settingGroup input{
+  width:100%;
+  }
 </style>
 </head>
 <body>
@@ -516,13 +541,41 @@ function calculate(){
 
 function renderSettings(){
   document.getElementById("content-settings").innerHTML=`
-    <h3>Settings</h3>
-    <p class="note">SHADOW OS v0.3</p>
-    <button class="action" onclick="changeTheme()">Change Theme</button>
-    <button class="action" onclick="clearNotes()">Clear Notes</button>
-    <button class="action" onclick="resetFiles()">Reset Virtual Files</button>
+    <h3>⚙️ Personalization</h3>
+
+    <div class="settingGroup">
+      <label>Desktop Wallpaper</label>
+      <select id="wallpaperChoice" onchange="applyAppearance()">
+        <option value="black">Shadow Black</option>
+        <option value="blue">Midnight Blue</option>
+        <option value="purple">Dark Purple</option>
+        <option value="red">Crimson Night</option>
+      </select>
+    </div>
+
+    <div class="settingGroup">
+      <label>Wallpaper Text Size</label>
+      <input id="wallpaperSize" type="range"
+        min="40" max="150" value="110"
+        oninput="applyAppearance()">
+    </div>
+
+    <div class="settingGroup">
+      <label>Wallpaper Text</label>
+      <input id="wallpaperText" maxlength="20"
+        placeholder="SHADOW"
+        oninput="applyAppearance()">
+    </div>
+
+    <div class="settingGroup">
+      <button class="action" onclick="resetAppearance()">
+        Reset Appearance
+      </button>
+    </div>
   `;
-}
+
+  loadAppearance();
+  }
 
 function changeTheme(){
   document.body.style.background=
@@ -607,6 +660,50 @@ function updateClock(){
     now.toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
 }
 
+function applyAppearance(){
+  const desktop=document.getElementById("desktop");
+  const wallpaper=document.getElementById("wallpaper");
+
+  const color=document.getElementById("wallpaperChoice").value;
+  const size=document.getElementById("wallpaperSize").value;
+  const text=document.getElementById("wallpaperText").value;
+
+  desktop.className="";
+  desktop.classList.add("wallpaper-"+color);
+
+  wallpaper.style.fontSize=size+"px";
+  wallpaper.textContent=text.trim()||"SHADOW";
+
+  const settings={
+    color,
+    size,
+    text
+  };
+
+  localStorage.setItem("shadow_appearance",JSON.stringify(settings));
+}
+
+function loadAppearance(){
+  let settings={color:"black",size:110,text:"SHADOW"};
+
+  try{
+    settings=JSON.parse(
+      localStorage.getItem("shadow_appearance")
+    )||settings;
+  }catch(e){}
+
+  document.getElementById("wallpaperChoice").value=settings.color;
+  document.getElementById("wallpaperSize").value=settings.size;
+  document.getElementById("wallpaperText").value=settings.text;
+
+  applyAppearance();
+}
+
+function resetAppearance(){
+  localStorage.removeItem("shadow_appearance");
+  loadAppearance();
+  }
+  
 updateClock();
 setInterval(updateClock,1000);
 </script>

@@ -175,6 +175,38 @@ textarea{resize:vertical;min-height:180px}
   font-size:11px;
   color:#8fa8c8;
   }
+  .browserToolbar {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: #151515;
+  border-bottom: 1px solid #333;
+}
+
+.browserToolbar button {
+  background: #292929;
+  color: white;
+  border: 1px solid #444;
+  padding: 7px 10px;
+  border-radius: 5px;
+}
+
+.browserToolbar input {
+  flex: 1;
+  min-width: 0;
+  background: #222;
+  color: white;
+  border: 1px solid #444;
+  padding: 7px;
+  border-radius: 5px;
+}
+
+.browserFrame {
+  width: 100%;
+  height: calc(100% - 45px);
+  border: none;
+  background: white;
+  }
 </style>
 </head>
 <body>
@@ -193,6 +225,7 @@ textarea{resize:vertical;min-height:180px}
   <div class="icon" onclick="openApp('about')"><span>◈</span>About</div>
   <div class="icon" onclick="openApp('system')"><span>🖥️</span>System</div>
   <div class="icon" onclick="openApp('appstore')"><span>🛒</span>App Store</div>
+ <div class="icon" onclick="openApp('browser')"> <span>🌐</span>Browser </div>
   <div id="wallpaper">SHADOW</div>
 </main>
 
@@ -211,6 +244,7 @@ textarea{resize:vertical;min-height:180px}
   <button onclick="openApp('about');toggleStart()">◈ About</button>
   <button onclick="openApp('system');toggleStart()">🖥️ System</button>
   <button onclick="openApp('appstore');toggleStart()">🛒 App Store</button>
+  <button onclick="openApp('browser')">🌐 Browser</button>
 </div>
 
 <script>
@@ -270,7 +304,8 @@ function openApp(name){
     settings:"Settings",
     about:"About SHADOW OS",
     system:"System Information",
-    appstore:"SHADOW App Store"
+    appstore:"SHADOW App Store",
+    browser:"SHADOW Browser",
   };
 
   const win=document.createElement("section");
@@ -1118,6 +1153,111 @@ function openStoreApp(id){
 
   focusWindow(win);
   dragWindow(win);
+  }
+  function renderBrowser(){
+  const id="window-browser";
+
+  if(document.getElementById(id)){
+    focusWindow(document.getElementById(id));
+    return;
+  }
+
+  const win=document.createElement("div");
+  win.className="window";
+  win.id=id;
+
+  win.style.width="85%";
+  win.style.height="75%";
+  win.style.top="10%";
+  win.style.left="7%";
+
+  win.innerHTML=`
+    <div class="titlebar">
+      <strong>🌐 SHADOW Browser</strong>
+      <div>
+        <button onclick="minimizeApp('browser')">_</button>
+        <button onclick="maximizeApp('browser')">□</button>
+        <button onclick="closeApp('browser')">×</button>
+      </div>
+    </div>
+
+    <div class="browserToolbar">
+      <button onclick="browserBack()">←</button>
+      <button onclick="browserForward()">→</button>
+      <button onclick="browserReload()">⟳</button>
+
+      <input id="browserAddress"
+        placeholder="Masukkan alamat website..."
+        onkeydown="if(event.key==='Enter') browserGo()">
+
+      <button onclick="browserGo()">Go</button>
+      <button onclick="browserExternal()">↗</button>
+    </div>
+
+    <iframe
+      id="browserFrame"
+      class="browserFrame"
+      src="about:blank">
+    </iframe>
+  `;
+
+  document.getElementById("desktop").appendChild(win);
+
+  focusWindow(win);
+  updateTaskbar();
+}
+
+function browserGo(){
+  const input=document.getElementById("browserAddress");
+  const frame=document.getElementById("browserFrame");
+
+  if(!input || !frame) return;
+
+  let url=input.value.trim();
+
+  if(!url) return;
+
+  if(!url.includes("://")){
+    url="https://"+url;
+  }
+
+  try{
+    const parsed=new URL(url);
+
+    if(parsed.protocol!=="https:" && parsed.protocol!=="http:"){
+      alert("Protokol URL tidak didukung.");
+      return;
+    }
+
+    input.value=parsed.href;
+    frame.src=parsed.href;
+
+  }catch(error){
+    alert("Alamat website tidak valid.");
+  }
+}
+
+function browserBack(){
+  const frame=document.getElementById("browserFrame");
+  try{frame.contentWindow.history.back();}catch(error){}
+}
+
+function browserForward(){
+  const frame=document.getElementById("browserFrame");
+  try{frame.contentWindow.history.forward();}catch(error){}
+}
+
+function browserReload(){
+  const frame=document.getElementById("browserFrame");
+  try{frame.contentWindow.location.reload();}catch(error){}
+}
+
+function browserExternal(){
+  const input=document.getElementById("browserAddress");
+
+  if(!input || !input.value) return;
+
+  window.open(input.value,"_blank");
   }
 updateClock();
 setInterval(updateClock,1000);

@@ -5,50 +5,94 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SHADOW OS</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090b10;color:#eee;font-family:Arial,sans-serif;overflow:hidden}
-#topbar{height:42px;background:#11151d;border-bottom:1px solid #252b36;display:flex;align-items:center;justify-content:space-between;padding:0 15px;font-size:13px}
-#desktop{height:calc(100dvh - 84px);padding:18px;position:relative;background:radial-gradient(ellipse at 70% 70%,#18202d,#090b10 65%)}
-#wallpaper{position:absolute;right:7%;bottom:10%;font-size:clamp(45px,12vw,110px);font-weight:900;letter-spacing:8px;color:#ffffff09;pointer-events:none}
-.icon{width:75px;text-align:center;margin-bottom:22px;cursor:pointer;font-size:12px;position:relative;z-index:1}
-.icon span{display:block;font-size:29px;margin-bottom:7px}
-#taskbar{height:42px;background:#11151deF;border-top:1px solid #252b36;display:flex;align-items:center;padding:0 12px;gap:15px}
-#startBtn{background:#202a38;border:0;color:white;padding:7px 13px;border-radius:5px}
-#clock{margin-left:auto;font-size:12px}
-#startMenu{display:none;position:absolute;bottom:48px;left:10px;width:220px;background:#151b26;border:1px solid #30394a;border-radius:9px;padding:12px;z-index:100}
-#startMenu button{display:block;width:100%;padding:11px;background:none;color:white;border:0;text-align:left;border-radius:5px}
-#startMenu button:active,#startMenu button:hover{background:#29364a}
-.window{position:absolute;top:55px;left:8%;width:min(650px,84vw);height:min(440px,65vh);background:#141a24;border:1px solid #394456;border-radius:9px;box-shadow:0 15px 45px #0009;overflow:hidden;z-index:5;display:flex;flex-direction:column}
-.window.maximized{inset:5px!important;width:auto!important;height:auto!important}
-.titlebar{height:39px;background:#202938;display:flex;align-items:center;padding:0 12px;cursor:move;flex-shrink:0}
-.titlebar strong{font-size:13px;flex:1}
-.controls{display:flex;gap:7px}
-.controls button{background:#303b4d;color:white;border:0;border-radius:4px;width:25px;height:24px}
-.controls .close{background:#a33}
-.content{padding:14px;overflow:auto;flex:1}
-.hidden{display:none!important}
-button{cursor:pointer}
-.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
-.action{background:#29374a;color:#eee;border:1px solid #3a4b63;padding:8px 11px;border-radius:5px;font-size:12px}
-.action:hover{background:#35465e}
-#path{font-size:12px;color:#aab8ca;margin:10px 0;padding:9px;background:#0e131c;border-radius:5px;overflow-wrap:anywhere}
-.fileitem{display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid #28313e;cursor:pointer;font-size:13px}
-.fileitem:hover{background:#222d3c}
-.fileitem .filename{flex:1;overflow-wrap:anywhere}
-.fileitem small{color:#8998aa}
-input,textarea{background:#0b1018;color:white;border:1px solid #354257;border-radius:5px;padding:9px;width:100%;margin:5px 0}
-textarea{resize:vertical;min-height:180px}
-#editor{display:none}
-#editor textarea{height:220px}
-#editorActions{display:flex;gap:8px;margin-top:8px}
-.empty{color:#8998aa;text-align:center;padding:35px 10px;font-size:13px}
-.note{font-size:13px;line-height:1.6;color:#c4cedb}
-  #appTasks{
+
+body{
+  margin:0;
+  background:#090b10;
+  color:#eee;
+  font-family:Arial,sans-serif;
+  overflow:hidden;
+}
+
+#topbar{
+  height:42px;
+  background:#11151d;
+  border-bottom:1px solid #252b36;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 15px;
+  font-size:13px;
+}
+
+#desktop{
+  height:calc(100dvh - 84px);
+  padding:18px;
+  position:relative;
+  background:radial-gradient(ellipse at 70% 70%,#18202d,#090b10 65%);
+}
+
+#wallpaper{
+  position:absolute;
+  right:7%;
+  bottom:10%;
+  font-size:clamp(45px,12vw,110px);
+  font-weight:900;
+  letter-spacing:8px;
+  color:#ffffff09;
+  pointer-events:none;
+}
+
+.icon{
+  width:75px;
+  text-align:center;
+  margin-bottom:22px;
+  cursor:pointer;
+  font-size:12px;
+  position:relative;
+  z-index:1;
+}
+
+.icon span{
+  display:block;
+  font-size:29px;
+  margin-bottom:7px;
+}
+
+#taskbar{
+  height:42px;
+  background:#11151deF;
+  border-top:1px solid #252b36;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  gap:15px;
+}
+
+#startBtn{
+  background:#202a38;
+  border:0;
+  color:white;
+  padding:7px 13px;
+  border-radius:5px;
+  flex-shrink:0;
+}
+
+#clock{
+  margin-left:auto;
+  font-size:12px;
+  flex-shrink:0;
+}
+
+#appTasks{
   display:flex;
   gap:6px;
   overflow-x:auto;
   flex:1;
+  min-width:0;
 }
 
 .taskBtn{
@@ -67,50 +111,267 @@ textarea{resize:vertical;min-height:180px}
   border-color:#607d9f;
 }
 
+#startMenu{
+  display:none;
+  position:absolute;
+  bottom:48px;
+  left:10px;
+  width:220px;
+  max-height:70vh;
+  overflow-y:auto;
+  background:#151b26;
+  border:1px solid #30394a;
+  border-radius:9px;
+  padding:12px;
+  z-index:100;
+}
+
+#startMenu button{
+  display:block;
+  width:100%;
+  padding:11px;
+  background:none;
+  color:white;
+  border:0;
+  text-align:left;
+  border-radius:5px;
+}
+
+#startMenu button:active,
+#startMenu button:hover{
+  background:#29364a;
+}
+
 .window{
-  resize:both;
+  position:absolute;
+  top:55px;
+  left:8%;
+  width:min(650px,84vw);
+  height:min(440px,65vh);
   min-width:230px;
   min-height:150px;
+  background:#141a24;
+  border:1px solid #394456;
+  border-radius:9px;
+  box-shadow:0 15px 45px #0009;
+  overflow:hidden;
+  z-index:5;
+  display:flex;
+  flex-direction:column;
+  resize:both;
+}
+
+.window.maximized{
+  inset:5px!important;
+  width:auto!important;
+  height:auto!important;
+  resize:none;
 }
 
 .window.activeWindow{
   border-color:#7189aa;
   box-shadow:0 15px 45px #000b;
-       }
-  .wallpaper-blue{
+}
+
+.titlebar{
+  height:39px;
+  min-height:39px;
+  background:#202938;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  cursor:move;
+  flex-shrink:0;
+  user-select:none;
+  touch-action:none;
+}
+
+.titlebar strong{
+  font-size:13px;
+  flex:1;
+}
+
+.controls{
+  display:flex;
+  gap:7px;
+}
+
+.controls button{
+  background:#303b4d;
+  color:white;
+  border:0;
+  border-radius:4px;
+  width:25px;
+  height:24px;
+}
+
+.controls .close{
+  background:#a33;
+}
+
+.content{
+  padding:14px;
+  overflow:auto;
+  flex:1;
+  min-height:0;
+}
+
+.hidden{
+  display:none!important;
+}
+
+button{
+  cursor:pointer;
+}
+
+.toolbar{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+
+.action{
+  background:#29374a;
+  color:#eee;
+  border:1px solid #3a4b63;
+  padding:8px 11px;
+  border-radius:5px;
+  font-size:12px;
+}
+
+.action:hover{
+  background:#35465e;
+}
+
+.action:disabled{
+  cursor:not-allowed;
+}
+
+#path{
+  font-size:12px;
+  color:#aab8ca;
+  margin:10px 0;
+  padding:9px;
+  background:#0e131c;
+  border-radius:5px;
+  overflow-wrap:anywhere;
+}
+
+.fileitem{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px;
+  border-bottom:1px solid #28313e;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.fileitem:hover{
+  background:#222d3c;
+}
+
+.fileitem .filename{
+  flex:1;
+  overflow-wrap:anywhere;
+}
+
+.fileitem small{
+  color:#8998aa;
+}
+
+input,textarea{
+  background:#0b1018;
+  color:white;
+  border:1px solid #354257;
+  border-radius:5px;
+  padding:9px;
+  width:100%;
+  margin:5px 0;
+}
+
+textarea{
+  resize:vertical;
+  min-height:180px;
+}
+
+#editor{
+  display:none;
+}
+
+#editor textarea{
+  height:220px;
+}
+
+#editorActions{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+
+.empty{
+  color:#8998aa;
+  text-align:center;
+  padding:35px 10px;
+  font-size:13px;
+}
+
+.note{
+  font-size:13px;
+  line-height:1.6;
+  color:#c4cedb;
+}
+
+.wallpaper-blue{
   background:radial-gradient(ellipse at 70% 70%,#142b48,#070b13 70%)!important;
 }
+
 .wallpaper-purple{
   background:radial-gradient(ellipse at 70% 70%,#302044,#090710 70%)!important;
 }
+
 .wallpaper-red{
   background:radial-gradient(ellipse at 70% 70%,#421b25,#10080b 70%)!important;
 }
+
 .wallpaper-black{
   background:radial-gradient(ellipse at 70% 70%,#181818,#050505 70%)!important;
 }
+
 .settingGroup{
   padding:12px 0;
   border-bottom:1px solid #30394a;
 }
+
 .settingGroup label{
   display:block;
   font-size:13px;
   margin-bottom:8px;
 }
+
 .settingGroup select,
 .settingGroup input{
   width:100%;
-  }
-  .systemCard{
+}
+
+.systemCard{
   background:#202938;
   border:1px solid #354257;
   border-radius:7px;
   padding:13px;
   margin:10px 0;
 }
-.systemCard h4{margin:0 0 8px}
-.systemCard p{font-size:12px;color:#bdc9d8}
+
+.systemCard h4{
+  margin:0 0 8px;
+}
+
+.systemCard p{
+  font-size:12px;
+  color:#bdc9d8;
+}
+
 .toast{
   position:absolute;
   right:15px;
@@ -124,6 +385,7 @@ textarea{resize:vertical;min-height:180px}
   font-size:12px;
   box-shadow:0 8px 25px #0008;
 }
+
 .powerMenu{
   position:absolute;
   z-index:150;
@@ -135,6 +397,7 @@ textarea{resize:vertical;min-height:180px}
   padding:10px;
   width:190px;
 }
+
 .powerMenu button{
   display:block;
   width:100%;
@@ -144,8 +407,12 @@ textarea{resize:vertical;min-height:180px}
   border:0;
   text-align:left;
 }
-.powerMenu button:hover{background:#2b3a50}
-  .storeSearch{
+
+.powerMenu button:hover{
+  background:#2b3a50;
+}
+
+.storeSearch{
   margin-bottom:12px;
 }
 
@@ -174,41 +441,71 @@ textarea{resize:vertical;min-height:180px}
 .storeStatus{
   font-size:11px;
   color:#8fa8c8;
+}
+
+/* BROWSER */
+
+.browserToolbar{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px;
+  background:#151515;
+  border-bottom:1px solid #333;
+  flex-shrink:0;
+}
+
+.browserToolbar button{
+  background:#292929;
+  color:white;
+  border:1px solid #444;
+  padding:7px 10px;
+  border-radius:5px;
+  flex-shrink:0;
+}
+
+.browserToolbar input{
+  flex:1;
+  min-width:0;
+  width:auto;
+  margin:0;
+  background:#222;
+  color:white;
+  border:1px solid #444;
+  padding:7px;
+  border-radius:5px;
+}
+
+.browserFrame{
+  width:100%;
+  flex:1;
+  min-height:0;
+  border:none;
+  background:white;
+}
+
+@media(max-width:500px){
+  #desktop{
+    padding:12px;
   }
-  .browserToolbar {
-  display: flex;
-  gap: 6px;
-  padding: 8px;
-  background: #151515;
-  border-bottom: 1px solid #333;
-}
 
-.browserToolbar button {
-  background: #292929;
-  color: white;
-  border: 1px solid #444;
-  padding: 7px 10px;
-  border-radius: 5px;
-}
-
-.browserToolbar input {
-  flex: 1;
-  min-width: 0;
-  background: #222;
-  color: white;
-  border: 1px solid #444;
-  padding: 7px;
-  border-radius: 5px;
-}
-
-.browserFrame {
-  width: 100%;
-  height: calc(100% - 45px);
-  border: none;
-  background: white;
+  .browserToolbar{
+    gap:3px;
+    padding:5px;
   }
+
+  .browserToolbar button{
+    padding:7px 6px;
+    font-size:11px;
+  }
+
+  .window{
+    max-width:96vw;
+  }
+}
 </style>
 </head>
+
 <body>
 
 <div id="topbar">
@@ -217,15 +514,43 @@ textarea{resize:vertical;min-height:180px}
 </div>
 
 <main id="desktop">
-  <div class="icon" onclick="openApp('computer')"><span>🖥️</span>My Computer</div>
-  <div class="icon" onclick="openApp('files')"><span>📁</span>File Manager</div>
-  <div class="icon" onclick="openApp('notes')"><span>📝</span>Notes</div>
-  <div class="icon" onclick="openApp('calculator')"><span>🧮</span>Calculator</div>
-  <div class="icon" onclick="openApp('settings')"><span>⚙️</span>Settings</div>
-  <div class="icon" onclick="openApp('about')"><span>◈</span>About</div>
-  <div class="icon" onclick="openApp('system')"><span>🖥️</span>System</div>
-  <div class="icon" onclick="openApp('appstore')"><span>🛒</span>App Store</div>
- <div class="icon" onclick="openApp('browser')"> <span>🌐</span>Browser </div>
+
+  <div class="icon" onclick="openApp('computer')">
+    <span>🖥️</span>My Computer
+  </div>
+
+  <div class="icon" onclick="openApp('files')">
+    <span>📁</span>File Manager
+  </div>
+
+  <div class="icon" onclick="openApp('notes')">
+    <span>📝</span>Notes
+  </div>
+
+  <div class="icon" onclick="openApp('calculator')">
+    <span>🧮</span>Calculator
+  </div>
+
+  <div class="icon" onclick="openApp('settings')">
+    <span>⚙️</span>Settings
+  </div>
+
+  <div class="icon" onclick="openApp('about')">
+    <span>◈</span>About
+  </div>
+
+  <div class="icon" onclick="openApp('system')">
+    <span>🖥️</span>System
+  </div>
+
+  <div class="icon" onclick="openApp('appstore')">
+    <span>🛒</span>App Store
+  </div>
+
+  <div class="icon" onclick="openApp('browser')">
+    <span>🌐</span>Browser
+  </div>
+
   <div id="wallpaper">SHADOW</div>
 </main>
 
@@ -234,9 +559,11 @@ textarea{resize:vertical;min-height:180px}
   <div id="appTasks"></div>
   <span id="clock"></span>
 </div>
-  
+
 <div id="startMenu">
   <strong style="display:block;padding:8px 10px">Applications</strong>
+
+  <button onclick="openApp('computer');toggleStart()">🖥️ My Computer</button>
   <button onclick="openApp('files');toggleStart()">📁 File Manager</button>
   <button onclick="openApp('notes');toggleStart()">📝 Notes</button>
   <button onclick="openApp('calculator');toggleStart()">🧮 Calculator</button>
@@ -244,11 +571,12 @@ textarea{resize:vertical;min-height:180px}
   <button onclick="openApp('about');toggleStart()">◈ About</button>
   <button onclick="openApp('system');toggleStart()">🖥️ System</button>
   <button onclick="openApp('appstore');toggleStart()">🛒 App Store</button>
-  <button onclick="openApp('browser')">🌐 Browser</button>
+  <button onclick="openApp('browser');toggleStart()">🌐 Browser</button>
 </div>
 
 <script>
 const desktop=document.getElementById("desktop");
+
 let highestZ=10;
 let currentPath=[];
 let editingId=null;
@@ -260,7 +588,13 @@ function initialFiles(){
     {id:"f1",name:"Documents",type:"folder",parent:"root"},
     {id:"f2",name:"Pictures",type:"folder",parent:"root"},
     {id:"f3",name:"Downloads",type:"folder",parent:"root"},
-    {id:"f4",name:"Readme.txt",type:"file",parent:"root",content:"Welcome to SHADOW OS.\n\nThis is your virtual file system."}
+    {
+      id:"f4",
+      name:"Readme.txt",
+      type:"file",
+      parent:"root",
+      content:"Welcome to SHADOW OS.\n\nThis is your virtual file system."
+    }
   ];
 }
 
@@ -268,7 +602,9 @@ function loadFiles(){
   try{
     const data=JSON.parse(localStorage.getItem(STORAGE));
     return Array.isArray(data)?data:initialFiles();
-  }catch(e){return initialFiles()}
+  }catch(e){
+    return initialFiles();
+  }
 }
 
 let files=loadFiles();
@@ -282,18 +618,28 @@ function makeId(){
 }
 
 function currentParent(){
-  return currentPath.length?currentPath[currentPath.length-1]:"root";
+  return currentPath.length
+    ?currentPath[currentPath.length-1]
+    :"root";
 }
 
 function getFolder(id){
   return files.find(f=>f.id===id&&f.type==="folder");
 }
 
+/* WINDOW MANAGER */
+
 function openApp(name){
   const old=document.getElementById("window-"+name);
+
   if(old){
-  focusWindow(old);
-  return;
+    focusWindow(old);
+    return;
+  }
+
+  if(name==="browser"){
+    renderBrowser();
+    return;
   }
 
   const titles={
@@ -304,9 +650,10 @@ function openApp(name){
     settings:"Settings",
     about:"About SHADOW OS",
     system:"System Information",
-    appstore:"SHADOW App Store",
-    browser:"SHADOW Browser",
+    appstore:"SHADOW App Store"
   };
+
+  if(!titles[name])return;
 
   const win=document.createElement("section");
   win.className="window";
@@ -316,21 +663,24 @@ function openApp(name){
   win.innerHTML=`
     <div class="titlebar">
       <strong>${titles[name]}</strong>
+
       <div class="controls">
         <button onclick="minimizeApp('${name}')">−</button>
         <button onclick="maximizeApp('${name}')">□</button>
         <button class="close" onclick="closeApp('${name}')">×</button>
       </div>
     </div>
+
     <div class="content" id="content-${name}"></div>
   `;
 
   desktop.appendChild(win);
-  win.addEventListener("pointerdown",()=>{
-  focusWindow(win);
-});
 
-focusWindow(win);
+  win.addEventListener("pointerdown",()=>{
+    focusWindow(win);
+  });
+
+  focusWindow(win);
   dragWindow(win);
 
   if(name==="files")renderFiles();
@@ -355,55 +705,151 @@ function minimizeApp(name){
 
 function maximizeApp(name){
   const win=document.getElementById("window-"+name);
+  if(!win)return;
+
   win.classList.toggle("maximized");
   focusWindow(win);
-  }
+}
+
+function focusWindow(win){
+  if(!win)return;
+
+  document.querySelectorAll(".window").forEach(w=>{
+    w.classList.remove("activeWindow");
+  });
+
+  win.classList.remove("hidden");
+  win.style.zIndex=++highestZ;
+  win.classList.add("activeWindow");
+
+  updateTaskbar();
+}
+
+function updateTaskbar(){
+  const taskbar=document.getElementById("appTasks");
+  taskbar.innerHTML="";
+
+  document.querySelectorAll(".window").forEach(win=>{
+    const name=win.id.replace("window-","");
+    const title=win.querySelector(".titlebar strong")?.textContent||name;
+
+    const button=document.createElement("button");
+    button.className="taskBtn";
+    button.textContent=title;
+
+    if(
+      !win.classList.contains("hidden") &&
+      Number(win.style.zIndex)===highestZ
+    ){
+      button.classList.add("active");
+    }
+
+    button.onclick=()=>{
+      if(win.classList.contains("hidden")){
+        focusWindow(win);
+      }else if(Number(win.style.zIndex)===highestZ){
+        minimizeApp(name);
+      }else{
+        focusWindow(win);
+      }
+
+      updateTaskbar();
+    };
+
+    taskbar.appendChild(button);
+  });
+}
 
 function dragWindow(win){
   const bar=win.querySelector(".titlebar");
-  let dragging=false,offsetX=0,offsetY=0;
+  if(!bar)return;
+
+  let dragging=false;
+  let offsetX=0;
+  let offsetY=0;
 
   bar.addEventListener("pointerdown",e=>{
-    if(e.target.tagName==="BUTTON")return;
+    if(e.target.closest("button"))return;
     if(win.classList.contains("maximized"))return;
+
     dragging=true;
+
     offsetX=e.clientX-win.offsetLeft;
     offsetY=e.clientY-win.offsetTop;
-    win.style.zIndex=++highestZ;
+
+    focusWindow(win);
+
     bar.setPointerCapture(e.pointerId);
   });
 
   bar.addEventListener("pointermove",e=>{
     if(!dragging)return;
-    win.style.left=Math.max(0,e.clientX-offsetX)+"px";
-    win.style.top=Math.max(0,e.clientY-offsetY)+"px";
+
+    const maxLeft=desktop.clientWidth-win.offsetWidth;
+    const maxTop=desktop.clientHeight-win.offsetHeight;
+
+    win.style.left=Math.max(
+      0,
+      Math.min(maxLeft,e.clientX-offsetX)
+    )+"px";
+
+    win.style.top=Math.max(
+      0,
+      Math.min(maxTop,e.clientY-offsetY)
+    )+"px";
   });
 
-  bar.addEventListener("pointerup",()=>dragging=false);
-  bar.addEventListener("pointercancel",()=>dragging=false);
+  bar.addEventListener("pointerup",()=>{
+    dragging=false;
+  });
+
+  bar.addEventListener("pointercancel",()=>{
+    dragging=false;
+  });
 }
+
+/* START MENU */
 
 function toggleStart(){
   const menu=document.getElementById("startMenu");
-  menu.style.display=menu.style.display==="block"?"none":"block";
+
+  menu.style.display=
+    menu.style.display==="block"?"none":"block";
 }
+
+/* MY COMPUTER */
 
 function renderComputer(){
   document.getElementById("content-computer").innerHTML=`
     <h3>My Computer</h3>
     <p class="note">SHADOW OS Virtual System</p>
-    <div class="fileitem">💾 <span class="filename">Local Storage</span><small>Browser</small></div>
-    <div class="fileitem">📁 <span class="filename">Virtual Files</span><small>${files.length} items</small></div>
-    <p class="note">File Manager menggunakan penyimpanan browser, bukan penyimpanan asli perangkat.</p>
+
+    <div class="fileitem">
+      💾
+      <span class="filename">Local Storage</span>
+      <small>Browser</small>
+    </div>
+
+    <div class="fileitem">
+      📁
+      <span class="filename">Virtual Files</span>
+      <small>${files.length} items</small>
+    </div>
+
+    <p class="note">
+      File Manager menggunakan penyimpanan browser,
+      bukan penyimpanan asli perangkat.
+    </p>
   `;
 }
+
+/* FILE MANAGER */
 
 function renderFiles(){
   const content=document.getElementById("content-files");
   if(!content)return;
 
   const parent=currentParent();
-  const folder=getFolder(parent);
 
   content.innerHTML=`
     <div class="toolbar">
@@ -412,11 +858,20 @@ function renderFiles(){
       <button class="action" onclick="createTextFile()">＋ Text File</button>
       <button class="action" onclick="refreshFiles()">↻ Refresh</button>
     </div>
-    <div id="path">📁 ${currentPath.length?currentPath.map(id=>getFolder(id)?.name||"Folder").join(" / "):"Home"}</div>
+
+    <div id="path">
+      📁 ${currentPath.length
+        ?currentPath.map(id=>getFolder(id)?.name||"Folder").join(" / ")
+        :"Home"}
+    </div>
+
     <div id="fileList"></div>
+
     <div id="editor">
       <h3 id="editorTitle">Text Editor</h3>
+
       <textarea id="fileText" placeholder="Tulis sesuatu..."></textarea>
+
       <div id="editorActions">
         <button class="action" onclick="saveTextFile()">Save</button>
         <button class="action" onclick="closeEditor()">Cancel</button>
@@ -430,11 +885,16 @@ function renderFiles(){
   if(children.length===0){
     list.innerHTML='<div class="empty">Folder ini masih kosong.</div>';
   }else{
-    children.sort((a,b)=>a.type===b.type?a.name.localeCompare(b.name):a.type==="folder"?-1:1);
+    children.sort((a,b)=>
+      a.type===b.type
+        ?a.name.localeCompare(b.name)
+        :a.type==="folder"?-1:1
+    );
 
     children.forEach(file=>{
       const item=document.createElement("div");
       item.className="fileitem";
+      item.dataset.fileId=file.id;
 
       const icon=document.createElement("span");
       icon.textContent=file.type==="folder"?"📁":"📄";
@@ -447,8 +907,15 @@ function renderFiles(){
       type.textContent=file.type==="folder"?"Folder":"Text File";
 
       item.append(icon,filename,type);
-      item.addEventListener("click",()=>selectFile(file.id));
-      item.addEventListener("dblclick",()=>openFile(file.id));
+
+      item.addEventListener("click",()=>{
+        selectFile(file.id);
+      });
+
+      item.addEventListener("dblclick",()=>{
+        if(file.type==="file")openFile(file.id);
+      });
+
       list.appendChild(item);
     });
   }
@@ -471,12 +938,14 @@ function openFile(id){
   if(!file)return;
 
   editingId=id;
+
   document.getElementById("fileList").style.display="none";
   document.querySelector("#content-files .toolbar").style.display="none";
   document.getElementById("path").style.display="none";
 
   const editor=document.getElementById("editor");
   editor.style.display="block";
+
   document.getElementById("editorTitle").textContent=file.name;
   document.getElementById("fileText").value=file.content||"";
 }
@@ -491,8 +960,10 @@ function saveTextFile(){
   if(!file)return;
 
   file.content=document.getElementById("fileText").value;
+
   saveFiles();
   closeEditor();
+
   alert("File berhasil disimpan.");
 }
 
@@ -500,14 +971,19 @@ function createFolder(){
   const name=prompt("Masukkan nama folder:");
   if(!name||!name.trim())return;
 
-  if(files.some(f=>f.parent===currentParent()&&f.name.toLowerCase()===name.trim().toLowerCase())){
+  const cleanName=name.trim();
+
+  if(files.some(f=>
+    f.parent===currentParent()&&
+    f.name.toLowerCase()===cleanName.toLowerCase()
+  )){
     alert("Nama tersebut sudah digunakan.");
     return;
   }
 
   files.push({
     id:makeId(),
-    name:name.trim(),
+    name:cleanName,
     type:"folder",
     parent:currentParent()
   });
@@ -520,14 +996,21 @@ function createTextFile(){
   const name=prompt("Nama file, contoh: Catatan.txt");
   if(!name||!name.trim())return;
 
-  const filename=name.trim().endsWith(".txt")?name.trim():name.trim()+".txt";
+  const cleanName=name.trim();
+  const filename=cleanName.endsWith(".txt")
+    ?cleanName
+    :cleanName+".txt";
 
-  if(files.some(f=>f.parent===currentParent()&&f.name.toLowerCase()===filename.toLowerCase())){
+  if(files.some(f=>
+    f.parent===currentParent()&&
+    f.name.toLowerCase()===filename.toLowerCase()
+  )){
     alert("Nama tersebut sudah digunakan.");
     return;
   }
 
   const id=makeId();
+
   files.push({
     id,
     name:filename,
@@ -560,12 +1043,18 @@ function renameFile(id){
   const name=prompt("Nama baru:",file.name);
   if(!name||!name.trim())return;
 
-  if(files.some(f=>f.id!==id&&f.parent===file.parent&&f.name.toLowerCase()===name.trim().toLowerCase())){
+  const cleanName=name.trim();
+
+  if(files.some(f=>
+    f.id!==id&&
+    f.parent===file.parent&&
+    f.name.toLowerCase()===cleanName.toLowerCase()
+  )){
     alert("Nama tersebut sudah digunakan.");
     return;
   }
 
-  file.name=name.trim();
+  file.name=cleanName;
   saveFiles();
   renderFiles();
 }
@@ -578,33 +1067,43 @@ function deleteFile(id){
 
   function removeChildren(parentId){
     files.filter(f=>f.parent===parentId).forEach(child=>{
-      if(child.type==="folder")removeChildren(child.id);
+      if(child.type==="folder"){
+        removeChildren(child.id);
+      }
+
       files=files.filter(f=>f.id!==child.id);
     });
   }
 
-  if(file.type==="folder")removeChildren(id);
+  if(file.type==="folder"){
+    removeChildren(id);
+  }
+
   files=files.filter(f=>f.id!==id);
+
   currentPath=currentPath.filter(pathId=>getFolder(pathId));
+
   saveFiles();
   renderFiles();
 }
 
-// Menu tindakan file lewat klik kanan.
+/* FILE CONTEXT MENU */
+
 document.addEventListener("contextmenu",e=>{
-  const item=e.target.closest(".fileitem");
+  const item=e.target.closest("#fileList .fileitem");
+
   if(!item||!document.getElementById("window-files"))return;
 
-  const parent=currentParent();
-  const visible=files.filter(f=>f.parent===parent);
-  const index=[...item.parentElement.children].indexOf(item);
-  const file=visible.sort((a,b)=>a.type===b.type?a.name.localeCompare(b.name):a.type==="folder"?-1:1)[index];
+  const fileId=item.dataset.fileId;
+  const file=files.find(f=>f.id===fileId);
 
   if(!file)return;
+
   e.preventDefault();
 
   const choice=prompt(
-    file.name+"\n\n1. Buka\n2. Ganti nama\n3. Hapus\n\nMasukkan angka:"
+    file.name+
+    "\n\n1. Buka\n2. Ganti nama\n3. Hapus\n\nMasukkan angka:"
   );
 
   if(choice==="1")selectFile(file.id);
@@ -612,27 +1111,42 @@ document.addEventListener("contextmenu",e=>{
   if(choice==="3")deleteFile(file.id);
 });
 
+/* NOTES */
+
 function renderNotes(){
   const content=document.getElementById("content-notes");
   const saved=localStorage.getItem("shadow_notes")||"";
 
   content.innerHTML=`
     <h3>Notes</h3>
-    <textarea id="notesText" placeholder="Tulis catatan...">${saved.replace(/</g,"&lt;")}</textarea>
+
+    <textarea id="notesText" placeholder="Tulis catatan..."></textarea>
+
     <button class="action" onclick="saveNotes()">Save Notes</button>
   `;
+
+  document.getElementById("notesText").value=saved;
 }
 
 function saveNotes(){
-  localStorage.setItem("shadow_notes",document.getElementById("notesText").value);
+  localStorage.setItem(
+    "shadow_notes",
+    document.getElementById("notesText").value
+  );
+
   alert("Notes saved.");
 }
+
+/* CALCULATOR */
 
 function renderCalculator(){
   document.getElementById("content-calculator").innerHTML=`
     <h3>Calculator</h3>
+
     <input id="calcInput" placeholder="Contoh: 12+5*2">
+
     <button class="action" onclick="calculate()">Calculate</button>
+
     <p id="calcResult" class="note">Result: -</p>
   `;
 }
@@ -641,6 +1155,11 @@ function calculate(){
   const input=document.getElementById("calcInput").value.trim();
   const result=document.getElementById("calcResult");
 
+  if(!input){
+    result.textContent="Masukkan perhitungan.";
+    return;
+  }
+
   if(!/^[0-9+\-*/().%\s]+$/.test(input)){
     result.textContent="Input tidak valid.";
     return;
@@ -648,11 +1167,15 @@ function calculate(){
 
   try{
     const value=Function('"use strict";return ('+input+')')();
-    result.textContent="Result: "+(Number.isFinite(value)?value:"Error");
+
+    result.textContent=
+      "Result: "+(Number.isFinite(value)?value:"Error");
   }catch(e){
     result.textContent="Expression error.";
   }
 }
+
+/* SETTINGS */
 
 function renderSettings(){
   document.getElementById("content-settings").innerHTML=`
@@ -660,6 +1183,7 @@ function renderSettings(){
 
     <div class="settingGroup">
       <label>Desktop Wallpaper</label>
+
       <select id="wallpaperChoice" onchange="applyAppearance()">
         <option value="black">Shadow Black</option>
         <option value="blue">Midnight Blue</option>
@@ -670,16 +1194,26 @@ function renderSettings(){
 
     <div class="settingGroup">
       <label>Wallpaper Text Size</label>
-      <input id="wallpaperSize" type="range"
-        min="40" max="150" value="110"
-        oninput="applyAppearance()">
+
+      <input
+        id="wallpaperSize"
+        type="range"
+        min="40"
+        max="150"
+        value="110"
+        oninput="applyAppearance()"
+      >
     </div>
 
     <div class="settingGroup">
       <label>Wallpaper Text</label>
-      <input id="wallpaperText" maxlength="20"
+
+      <input
+        id="wallpaperText"
+        maxlength="20"
         placeholder="SHADOW"
-        oninput="applyAppearance()">
+        oninput="applyAppearance()"
+      >
     </div>
 
     <div class="settingGroup">
@@ -690,89 +1224,6 @@ function renderSettings(){
   `;
 
   loadAppearance();
-  }
-
-function changeTheme(){
-  document.body.style.background=
-    document.body.style.background.includes("rgb(12")?"#090b10":"#0c1422";
-}
-
-function clearNotes(){
-  if(confirm("Hapus semua catatan?")){
-    localStorage.removeItem("shadow_notes");
-    alert("Notes cleared.");
-  }
-}
-
-function resetFiles(){
-  if(!confirm("Reset semua file virtual?"))return;
-  files=initialFiles();
-  currentPath=[];
-  saveFiles();
-  renderFiles();
-  alert("Virtual files berhasil direset.");
-}
-
-function renderAbout(){
-  document.getElementById("content-about").innerHTML=`
-    <h2>◈ SHADOW OS</h2>
-    <p class="note">Version 0.7</p>
-    <p class="note">A browser-based virtual desktop environment.</p>
-    <p class="note">Created for experimentation and learning.</p>
-  `;
-}
-
-function updateTaskbar(){
-  const taskbar=document.getElementById("appTasks");
-  taskbar.innerHTML="";
-
-  document.querySelectorAll(".window").forEach(win=>{
-    const name=win.id.replace("window-","");
-    const title=win.querySelector(".titlebar strong").textContent;
-
-    const button=document.createElement("button");
-    button.className="taskBtn";
-    button.textContent=title;
-
-    if(!win.classList.contains("hidden") &&
-       win.style.zIndex==highestZ){
-      button.classList.add("active");
-    }
-
-    button.onclick=()=>{
-      if(win.classList.contains("hidden")){
-        win.classList.remove("hidden");
-        focusWindow(win);
-      }else if(win.style.zIndex==highestZ){
-        minimizeApp(name);
-      }else{
-        focusWindow(win);
-      }
-      updateTaskbar();
-    };
-
-    taskbar.appendChild(button);
-  });
-}
-
-function focusWindow(win){
-  document.querySelectorAll(".window").forEach(w=>{
-    w.classList.remove("activeWindow");
-  });
-
-  win.classList.remove("hidden");
-  win.style.zIndex=++highestZ;
-  win.classList.add("activeWindow");
-
-  updateTaskbar();
-  }
-  
-function updateClock(){
-  const now=new Date();
-  document.getElementById("clock").textContent=
-    now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-  document.getElementById("topDate").textContent=
-    now.toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
 }
 
 function applyAppearance(){
@@ -783,29 +1234,44 @@ function applyAppearance(){
   const size=document.getElementById("wallpaperSize").value;
   const text=document.getElementById("wallpaperText").value;
 
-  desktop.className="";
+  desktop.classList.remove(
+    "wallpaper-black",
+    "wallpaper-blue",
+    "wallpaper-purple",
+    "wallpaper-red"
+  );
+
   desktop.classList.add("wallpaper-"+color);
 
   wallpaper.style.fontSize=size+"px";
   wallpaper.textContent=text.trim()||"SHADOW";
 
-  const settings={
-    color,
-    size,
-    text
-  };
+  const settings={color,size,text};
 
-  localStorage.setItem("shadow_appearance",JSON.stringify(settings));
+  localStorage.setItem(
+    "shadow_appearance",
+    JSON.stringify(settings)
+  );
 }
 
 function loadAppearance(){
-  let settings={color:"black",size:110,text:"SHADOW"};
+  let settings={
+    color:"black",
+    size:110,
+    text:"SHADOW"
+  };
 
   try{
     settings=JSON.parse(
       localStorage.getItem("shadow_appearance")
     )||settings;
   }catch(e){}
+
+  const validColors=["black","blue","purple","red"];
+
+  if(!validColors.includes(settings.color)){
+    settings.color="black";
+  }
 
   document.getElementById("wallpaperChoice").value=settings.color;
   document.getElementById("wallpaperSize").value=settings.size;
@@ -817,14 +1283,29 @@ function loadAppearance(){
 function resetAppearance(){
   localStorage.removeItem("shadow_appearance");
   loadAppearance();
-  }
-  function renderSystem(){
+}
+
+/* ABOUT */
+
+function renderAbout(){
+  document.getElementById("content-about").innerHTML=`
+    <h2>◈ SHADOW OS</h2>
+    <p class="note">Version 0.9</p>
+    <p class="note">A browser-based virtual desktop environment.</p>
+    <p class="note">Created for experimentation and learning.</p>
+  `;
+}
+
+/* SYSTEM INFORMATION */
+
+function renderSystem(){
   const content=document.getElementById("content-system");
 
   const used=new Blob([
     JSON.stringify(files),
     localStorage.getItem("shadow_notes")||"",
-    localStorage.getItem("shadow_appearance")||""
+    localStorage.getItem("shadow_appearance")||"",
+    localStorage.getItem(STORE_KEY)||""
   ]).size;
 
   const kb=(used/1024).toFixed(2);
@@ -834,7 +1315,7 @@ function resetAppearance(){
 
     <div class="systemCard">
       <h4>SHADOW OS</h4>
-      <p>Version: 0.7</p>
+      <p>Version: 0.9</p>
       <p>Platform: Web Browser</p>
       <p>Status: Running</p>
     </div>
@@ -848,12 +1329,15 @@ function resetAppearance(){
 
     <div class="systemCard">
       <h4>⚙️ System Actions</h4>
+
       <button class="action" onclick="showNotification('SHADOW OS','System berjalan normal.')">
         Test Notification
       </button>
+
       <button class="action" onclick="clearTemporaryData()">
         Clear Temporary Data
       </button>
+
       <button class="action" onclick="showPowerMenu()">
         Power Options
       </button>
@@ -877,13 +1361,18 @@ function showNotification(title,message){
   toast.append(heading,body);
   desktop.appendChild(toast);
 
-  setTimeout(()=>toast.remove(),3500);
+  setTimeout(()=>{
+    toast.remove();
+  },3500);
 }
 
 function clearTemporaryData(){
   if(!confirm("Bersihkan data sementara SHADOW OS?"))return;
 
-  showNotification("System Cleaner","Tidak ada data sementara yang perlu dibersihkan.");
+  showNotification(
+    "System Cleaner",
+    "Tidak ada data sementara yang perlu dibersihkan."
+  );
 }
 
 function showPowerMenu(){
@@ -895,8 +1384,14 @@ function showPowerMenu(){
 
   menu.innerHTML=`
     <button onclick="restartShadow()">↻ Restart SHADOW OS</button>
-    <button onclick="showNotification('Power','SHADOW OS masih berjalan di browser.')">⏻ Shut Down</button>
-    <button onclick="document.getElementById('powerMenu').remove()">Cancel</button>
+
+    <button onclick="showNotification('Power','SHADOW OS masih berjalan di browser.')">
+      ⏻ Shut Down
+    </button>
+
+    <button onclick="document.getElementById('powerMenu').remove()">
+      Cancel
+    </button>
   `;
 
   desktop.appendChild(menu);
@@ -905,15 +1400,24 @@ function showPowerMenu(){
 function restartShadow(){
   if(!confirm("Restart tampilan SHADOW OS?"))return;
 
-  document.querySelectorAll(".window").forEach(win=>win.remove());
+  document.querySelectorAll(".window").forEach(win=>{
+    win.remove();
+  });
+
   currentPath=[];
+  editingId=null;
+
   document.getElementById("powerMenu")?.remove();
 
-  showNotification("SHADOW OS","Tampilan berhasil dimulai ulang.");
-  }
-  // ===================================
-// SHADOW OS v0.7 - VIRTUAL APP STORE
-// ===================================
+  updateTaskbar();
+
+  showNotification(
+    "SHADOW OS",
+    "Tampilan berhasil dimulai ulang."
+  );
+}
+
+/* APP STORE */
 
 const STORE_KEY="shadow_os_installed_apps";
 
@@ -986,7 +1490,10 @@ function renderAppStore(){
 
   content.innerHTML=`
     <h3>🛒 SHADOW App Store</h3>
-    <p class="note">Discover virtual applications for your system.</p>
+
+    <p class="note">
+      Discover virtual applications for your system.
+    </p>
 
     <input
       class="storeSearch"
@@ -998,7 +1505,8 @@ function renderAppStore(){
     <div id="storeAppList"></div>
 
     <p class="note">
-      Installed Applications: <strong id="installedCount">0</strong>
+      Installed Applications:
+      <strong id="installedCount">0</strong>
     </p>
   `;
 
@@ -1060,7 +1568,14 @@ function filterStoreApps(){
     uninstall.style.opacity=installed?"1":"0.4";
     uninstall.onclick=()=>uninstallStoreApp(app.id);
 
-    card.append(title,category,description,button,uninstall);
+    card.append(
+      title,
+      category,
+      description,
+      button,
+      uninstall
+    );
+
     list.appendChild(card);
   });
 
@@ -1070,6 +1585,7 @@ function filterStoreApps(){
 
 function installStoreApp(id){
   const app=storeApps.find(a=>a.id===id);
+
   if(!app||installedApps.includes(id))return;
 
   installedApps.push(id);
@@ -1084,6 +1600,7 @@ function installStoreApp(id){
 
 function uninstallStoreApp(id){
   const app=storeApps.find(a=>a.id===id);
+
   if(!app||!installedApps.includes(id))return;
 
   if(!confirm("Uninstall "+app.name+"?"))return;
@@ -1124,6 +1641,7 @@ function openStoreApp(id){
   win.innerHTML=`
     <div class="titlebar">
       <strong>${app.icon} ${app.name}</strong>
+
       <div class="controls">
         <button onclick="minimizeApp('storeapp-${id}')">−</button>
         <button onclick="maximizeApp('storeapp-${id}')">□</button>
@@ -1133,12 +1651,15 @@ function openStoreApp(id){
 
     <div class="content">
       <h3>${app.icon} ${app.name}</h3>
+
       <p class="note">${app.description}</p>
+
       <div class="systemCard">
         <h4>Application Status</h4>
         <p>Installed successfully.</p>
         <p>SHADOW OS Virtual Application</p>
       </div>
+
       <p class="note">
         This application is currently a virtual demonstration.
       </p>
@@ -1153,16 +1674,20 @@ function openStoreApp(id){
 
   focusWindow(win);
   dragWindow(win);
-  }
-  function renderBrowser(){
-  const id="window-browser";
+}
 
-  if(document.getElementById(id)){
-    focusWindow(document.getElementById(id));
+/* SHADOW BROWSER */
+
+function renderBrowser(){
+  const id="window-browser";
+  const old=document.getElementById(id);
+
+  if(old){
+    focusWindow(old);
     return;
   }
 
-  const win=document.createElement("div");
+  const win=document.createElement("section");
   win.className="window";
   win.id=id;
 
@@ -1174,10 +1699,11 @@ function openStoreApp(id){
   win.innerHTML=`
     <div class="titlebar">
       <strong>🌐 SHADOW Browser</strong>
-      <div>
-        <button onclick="minimizeApp('browser')">_</button>
+
+      <div class="controls">
+        <button onclick="minimizeApp('browser')">−</button>
         <button onclick="maximizeApp('browser')">□</button>
-        <button onclick="closeApp('browser')">×</button>
+        <button class="close" onclick="closeApp('browser')">×</button>
       </div>
     </div>
 
@@ -1186,9 +1712,11 @@ function openStoreApp(id){
       <button onclick="browserForward()">→</button>
       <button onclick="browserReload()">⟳</button>
 
-      <input id="browserAddress"
+      <input
+        id="browserAddress"
         placeholder="Masukkan alamat website..."
-        onkeydown="if(event.key==='Enter') browserGo()">
+        onkeydown="if(event.key==='Enter') browserGo()"
+      >
 
       <button onclick="browserGo()">Go</button>
       <button onclick="browserExternal()">↗</button>
@@ -1197,70 +1725,126 @@ function openStoreApp(id){
     <iframe
       id="browserFrame"
       class="browserFrame"
-      src="about:blank">
-    </iframe>
+      src="about:blank"
+      title="SHADOW Browser"
+    ></iframe>
   `;
 
-  document.getElementById("desktop").appendChild(win);
+  desktop.appendChild(win);
+
+  win.addEventListener("pointerdown",()=>{
+    focusWindow(win);
+  });
 
   focusWindow(win);
+  dragWindow(win);
   updateTaskbar();
 }
 
-function browserGo(){
+function getBrowserURL(){
   const input=document.getElementById("browserAddress");
-  const frame=document.getElementById("browserFrame");
-
-  if(!input || !frame) return;
+  if(!input)return null;
 
   let url=input.value.trim();
+  if(!url)return null;
 
-  if(!url) return;
-
-  if(!url.includes("://")){
+  if(!/^https?:\/\//i.test(url)){
     url="https://"+url;
   }
 
   try{
     const parsed=new URL(url);
 
-    if(parsed.protocol!=="https:" && parsed.protocol!=="http:"){
-      alert("Protokol URL tidak didukung.");
-      return;
+    if(
+      parsed.protocol!=="https:"&&
+      parsed.protocol!=="http:"
+    ){
+      return null;
     }
 
-    input.value=parsed.href;
-    frame.src=parsed.href;
-
-  }catch(error){
-    alert("Alamat website tidak valid.");
+    return parsed.href;
+  }catch(e){
+    return null;
   }
+}
+
+function browserGo(){
+  const input=document.getElementById("browserAddress");
+  const frame=document.getElementById("browserFrame");
+
+  if(!input||!frame)return;
+
+  const url=getBrowserURL();
+
+  if(!url){
+    alert("Alamat website tidak valid.");
+    return;
+  }
+
+  input.value=url;
+  frame.src=url;
 }
 
 function browserBack(){
   const frame=document.getElementById("browserFrame");
-  try{frame.contentWindow.history.back();}catch(error){}
+  if(!frame)return;
+
+  try{
+    frame.contentWindow.history.back();
+  }catch(e){}
 }
 
 function browserForward(){
   const frame=document.getElementById("browserFrame");
-  try{frame.contentWindow.history.forward();}catch(error){}
+  if(!frame)return;
+
+  try{
+    frame.contentWindow.history.forward();
+  }catch(e){}
 }
 
 function browserReload(){
   const frame=document.getElementById("browserFrame");
-  try{frame.contentWindow.location.reload();}catch(error){}
+  if(!frame)return;
+
+  try{
+    frame.contentWindow.location.reload();
+  }catch(e){}
 }
 
 function browserExternal(){
-  const input=document.getElementById("browserAddress");
+  const url=getBrowserURL();
 
-  if(!input || !input.value) return;
-
-  window.open(input.value,"_blank");
+  if(!url){
+    alert("Masukkan alamat website yang valid.");
+    return;
   }
+
+  window.open(url,"_blank","noopener,noreferrer");
+}
+
+/* CLOCK */
+
+function updateClock(){
+  const now=new Date();
+
+  document.getElementById("clock").textContent=
+    now.toLocaleTimeString("id-ID",{
+      hour:"2-digit",
+      minute:"2-digit"
+    });
+
+  document.getElementById("topDate").textContent=
+    now.toLocaleDateString("id-ID",{
+      day:"numeric",
+      month:"short",
+      year:"numeric"
+    });
+}
+
 updateClock();
 setInterval(updateClock,1000);
+
 </script>
 </body>
 </html>

@@ -1,1850 +1,955 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHADOW OS</title>
+<meta name="theme-color" content="#0b0e14">
+<title>ShadowOS</title>
 
 <style>
+:root {
+  --bg:#0b0e14;
+  --panel:rgba(19,24,34,.94);
+  --panel2:#171e2b;
+  --line:rgba(190,205,230,.13);
+  --text:#edf2fb;
+  --muted:#96a2b7;
+  --accent:#9bb7ed;
+  --shadow:0 24px 70px #0009;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:#090b10;
-  color:#eee;
-  font-family:Arial,sans-serif;
-  overflow:hidden;
-}
-
-#topbar{
-  height:42px;
-  background:#11151d;
-  border-bottom:1px solid #252b36;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 15px;
-  font-size:13px;
-}
+body{margin:0;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;font-size:14px}
+button,input,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
 
 #desktop{
-  height:calc(100dvh - 84px);
-  padding:18px;
-  position:relative;
-  background:radial-gradient(ellipse at 70% 70%,#18202d,#090b10 65%);
+  position:fixed;inset:0;
+  background:
+  radial-gradient(ellipse at 18% 20%,#283958 0,transparent 38%),
+  radial-gradient(ellipse at 80% 78%,#172c35 0,transparent 40%),
+  linear-gradient(135deg,#101722,#080b11 70%);
+  background-size:cover;background-position:center;overflow:hidden;
 }
+.desktop-brand{position:absolute;top:30px;left:34px;pointer-events:none}
+.desktop-brand strong{font-size:13px;letter-spacing:.28em}
+.desktop-brand small{display:block;color:#aab7cc;margin-top:6px;font-size:10px;letter-spacing:.08em}
 
-#wallpaper{
-  position:absolute;
-  right:7%;
-  bottom:10%;
-  font-size:clamp(45px,12vw,110px);
-  font-weight:900;
-  letter-spacing:8px;
-  color:#ffffff09;
-  pointer-events:none;
+#desktopIcons{position:absolute;top:92px;left:25px;display:grid;gap:10px}
+.desk-icon{
+  border:0;background:transparent;width:76px;padding:9px 4px;
+  border-radius:12px;display:grid;justify-items:center;gap:7px;color:white;
 }
-
-.icon{
-  width:75px;
-  text-align:center;
-  margin-bottom:22px;
-  cursor:pointer;
-  font-size:12px;
-  position:relative;
-  z-index:1;
-}
-
-.icon span{
-  display:block;
-  font-size:29px;
-  margin-bottom:7px;
-}
+.desk-icon:hover{background:#ffffff12}
+.desk-icon svg{width:28px;height:28px}
+.desk-icon span{font-size:11px}
 
 #taskbar{
-  height:42px;
-  background:#11151deF;
-  border-top:1px solid #252b36;
-  display:flex;
-  align-items:center;
-  padding:0 12px;
-  gap:15px;
+  position:absolute;z-index:900;left:50%;bottom:13px;
+  transform:translateX(-50%);height:58px;max-width:calc(100% - 22px);
+  width:max-content;display:flex;align-items:center;gap:6px;padding:7px 10px;
+  background:rgba(12,16,24,.86);border:1px solid #ffffff20;
+  border-radius:18px;box-shadow:0 12px 35px #0008;
+  backdrop-filter:blur(24px);
 }
-
-#startBtn{
-  background:#202a38;
-  border:0;
-  color:white;
-  padding:7px 13px;
-  border-radius:5px;
-  flex-shrink:0;
+.task-app,.start-button{
+  height:42px;min-width:42px;border:0;border-radius:12px;
+  background:transparent;display:grid;place-items:center;position:relative;
 }
-
-#clock{
-  margin-left:auto;
-  font-size:12px;
-  flex-shrink:0;
+.task-app svg,.start-button svg{width:21px;height:21px}
+.task-app:hover,.start-button:hover{background:#ffffff14}
+.task-app.active:after{
+  content:"";position:absolute;bottom:2px;width:13px;height:3px;
+  border-radius:5px;background:var(--accent);
 }
+.task-divider{height:28px;width:1px;background:#ffffff20;margin:0 3px}
+.status{display:flex;align-items:center;gap:9px;padding:0 9px;color:#c7d2e5;font-size:11px}
+.status button{border:0;background:none;padding:4px}
+.status svg{width:15px;height:15px;vertical-align:middle}
+.clock{font-size:11px;line-height:1.3;text-align:right}
+.clock b{display:block;font-size:12px;color:white}
 
-#appTasks{
-  display:flex;
-  gap:6px;
-  overflow-x:auto;
-  flex:1;
-  min-width:0;
+#startMenu,#quickPanel{
+  position:absolute;z-index:950;background:rgba(15,20,30,.96);
+  border:1px solid var(--line);border-radius:20px;
+  box-shadow:var(--shadow);backdrop-filter:blur(24px);display:none;
 }
-
-.taskBtn{
-  background:#202a38;
-  color:#aaa;
-  border:1px solid #30394a;
-  padding:6px 10px;
-  border-radius:5px;
-  font-size:11px;
-  white-space:nowrap;
-}
-
-.taskBtn.active{
-  background:#354b68;
-  color:white;
-  border-color:#607d9f;
-}
-
 #startMenu{
-  display:none;
-  position:absolute;
-  bottom:48px;
-  left:10px;
-  width:220px;
-  max-height:70vh;
-  overflow-y:auto;
-  background:#151b26;
-  border:1px solid #30394a;
-  border-radius:9px;
-  padding:12px;
-  z-index:100;
+  bottom:82px;left:50%;transform:translateX(-50%);
+  width:min(430px,calc(100% - 24px));padding:18px;
 }
-
-#startMenu button{
-  display:block;
-  width:100%;
-  padding:11px;
-  background:none;
-  color:white;
-  border:0;
-  text-align:left;
-  border-radius:5px;
+#startMenu.show,#quickPanel.show{display:block}
+.start-head{display:flex;justify-content:space-between;margin-bottom:15px}
+.start-head strong{letter-spacing:.13em;font-size:12px}
+.search,.field{
+  width:100%;background:#0b1019;border:1px solid var(--line);
+  border-radius:9px;padding:10px;color:white;outline:none;
 }
+.app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}
+.app-tile{
+  border:0;background:transparent;border-radius:12px;padding:12px 4px;
+  display:grid;justify-items:center;gap:8px;font-size:11px;
+}
+.app-tile:hover{background:#ffffff10}
+.app-tile svg{width:25px;height:25px}
 
-#startMenu button:active,
-#startMenu button:hover{
-  background:#29364a;
+#quickPanel{right:15px;bottom:82px;width:280px;padding:15px}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quick-grid button{
+  padding:12px 8px;border:1px solid var(--line);
+  border-radius:10px;background:#ffffff0a;text-align:left;font-size:11px;
 }
 
 .window{
-  position:absolute;
-  top:55px;
-  left:8%;
-  width:min(650px,84vw);
-  height:min(440px,65vh);
-  min-width:230px;
-  min-height:150px;
-  background:#141a24;
-  border:1px solid #394456;
-  border-radius:9px;
-  box-shadow:0 15px 45px #0009;
-  overflow:hidden;
-  z-index:5;
-  display:flex;
-  flex-direction:column;
-  resize:both;
+  position:absolute;z-index:20;min-width:280px;min-height:190px;
+  width:590px;height:410px;max-width:calc(100vw - 20px);
+  max-height:calc(100dvh - 95px);
+  background:rgba(17,22,32,.97);border:1px solid #ffffff20;
+  border-radius:15px;box-shadow:var(--shadow);
+  backdrop-filter:blur(22px);overflow:hidden;display:flex;flex-direction:column;
 }
-
+.window.focused{border-color:#a8c1ed66;box-shadow:0 25px 75px #000a}
 .window.maximized{
-  inset:5px!important;
-  width:auto!important;
-  height:auto!important;
-  resize:none;
+  left:10px!important;top:10px!important;
+  width:calc(100vw - 20px)!important;
+  height:calc(100dvh - 91px)!important;
 }
-
-.window.activeWindow{
-  border-color:#7189aa;
-  box-shadow:0 15px 45px #000b;
-}
-
 .titlebar{
-  height:39px;
-  min-height:39px;
-  background:#202938;
-  display:flex;
-  align-items:center;
-  padding:0 12px;
-  cursor:move;
-  flex-shrink:0;
-  user-select:none;
+  height:43px;flex:0 0 43px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 12px 0 15px;
+  background:#ffffff06;border-bottom:1px solid var(--line);
+  cursor:grab;touch-action:none;user-select:none;
+}
+.titlebar:active{cursor:grabbing}
+.window-title{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:650}
+.window-title svg{width:16px;height:16px;color:#c1d2f1}
+.win-actions{display:flex;gap:5px}
+.win-actions button{
+  border:0;background:transparent;width:25px;height:25px;
+  border-radius:7px;color:#aebbd0;
+}
+.win-actions button:hover{background:#ffffff16}
+.win-actions .close:hover{background:#a94350;color:white}
+.window-content{flex:1;min-height:0;overflow:auto;padding:16px}
+.resize-handle{
+  position:absolute;right:0;bottom:0;width:17px;height:17px;
+  cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,#a9bde355 50%);
   touch-action:none;
 }
 
-.titlebar strong{
-  font-size:13px;
-  flex:1;
+.panel{background:#ffffff08;border:1px solid var(--line);border-radius:12px;padding:13px}
+.muted{color:var(--muted)}
+.row{display:flex;align-items:center;gap:9px}
+.between{justify-content:space-between}
+.primary{
+  background:#9bb7ed;color:#111927;border:0;
+  border-radius:9px;padding:9px 13px;font-weight:650;
 }
+.secondary{
+  background:#ffffff0d;color:#e8eef9;border:1px solid var(--line);
+  border-radius:9px;padding:8px 11px;
+}
+.section-title{font-size:11px;letter-spacing:.13em;color:#9daec8;text-transform:uppercase}
 
-.controls{
-  display:flex;
-  gap:7px;
+.calc{max-width:360px;margin:auto}
+.calc-screen{
+  background:#0b1018;border:1px solid var(--line);border-radius:12px;
+  padding:16px;text-align:right;margin-bottom:12px;min-height:92px;
 }
+.calc-expression{color:#91a0b8;font-size:13px;min-height:20px;overflow-wrap:anywhere}
+.calc-value{font-size:31px;font-weight:550;overflow-wrap:anywhere}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.calc-grid button{
+  height:54px;border:1px solid #ffffff0d;border-radius:10px;
+  background:#ffffff0a;font-size:17px;
+}
+.calc-grid button:hover{background:#ffffff18}
+.calc-grid .op{color:#c3d6fa;background:#9bb7ed18}
+.calc-grid .equal{background:#9bb7ed;color:#101827}
 
-.controls button{
-  background:#303b4d;
-  color:white;
-  border:0;
-  border-radius:4px;
-  width:25px;
-  height:24px;
+.file-layout{display:grid;grid-template-columns:145px 1fr;gap:13px;height:100%}
+.file-side{border-right:1px solid var(--line);padding-right:10px}
+.file-side button{
+  display:block;width:100%;text-align:left;border:0;background:transparent;
+  padding:9px;border-radius:8px;color:#aebbd0;font-size:12px;
 }
+.file-side button:hover{background:#ffffff10;color:white}
+.file-main{min-width:0}
+.file-tools{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.file-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px}
+.file-item{
+  background:#ffffff08;border:1px solid var(--line);
+  border-radius:10px;padding:12px 8px;text-align:center;min-width:0;
+}
+.file-item svg{width:25px;height:25px;color:#b9cbed}
+.file-item div{font-size:11px;margin-top:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-.controls .close{
-  background:#a33;
+.store-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.store-card{padding:13px;border:1px solid var(--line);background:#ffffff07;border-radius:12px}
+.store-icon{
+  width:38px;height:38px;border-radius:11px;background:#9bb7ed18;
+  display:grid;place-items:center;margin-bottom:10px;
 }
+.store-icon svg{width:22px;height:22px;color:#c8d9f8}
+.store-card p{color:var(--muted);font-size:11px;min-height:30px}
 
-.content{
-  padding:14px;
-  overflow:auto;
-  flex:1;
-  min-height:0;
-}
+.browser-top{display:flex;gap:7px;margin-bottom:10px}
+.browser-top input{flex:1;min-width:0}
+.browser-frame{width:100%;height:calc(100% - 48px);border:1px solid var(--line);border-radius:10px;background:white}
 
-.hidden{
-  display:none!important;
-}
-
-button{
-  cursor:pointer;
-}
-
-.toolbar{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-
-.action{
-  background:#29374a;
-  color:#eee;
-  border:1px solid #3a4b63;
-  padding:8px 11px;
-  border-radius:5px;
-  font-size:12px;
-}
-
-.action:hover{
-  background:#35465e;
-}
-
-.action:disabled{
-  cursor:not-allowed;
-}
-
-#path{
-  font-size:12px;
-  color:#aab8ca;
-  margin:10px 0;
-  padding:9px;
-  background:#0e131c;
-  border-radius:5px;
-  overflow-wrap:anywhere;
-}
-
-.fileitem{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:11px;
-  border-bottom:1px solid #28313e;
-  cursor:pointer;
-  font-size:13px;
-}
-
-.fileitem:hover{
-  background:#222d3c;
-}
-
-.fileitem .filename{
-  flex:1;
-  overflow-wrap:anywhere;
-}
-
-.fileitem small{
-  color:#8998aa;
-}
-
-input,textarea{
-  background:#0b1018;
-  color:white;
-  border:1px solid #354257;
-  border-radius:5px;
-  padding:9px;
-  width:100%;
-  margin:5px 0;
-}
-
-textarea{
-  resize:vertical;
-  min-height:180px;
-}
-
-#editor{
-  display:none;
-}
-
-#editor textarea{
-  height:220px;
-}
-
-#editorActions{
-  display:flex;
-  gap:8px;
-  margin-top:8px;
-}
-
-.empty{
-  color:#8998aa;
-  text-align:center;
-  padding:35px 10px;
-  font-size:13px;
-}
-
-.note{
-  font-size:13px;
-  line-height:1.6;
-  color:#c4cedb;
-}
-
-.wallpaper-blue{
-  background:radial-gradient(ellipse at 70% 70%,#142b48,#070b13 70%)!important;
-}
-
-.wallpaper-purple{
-  background:radial-gradient(ellipse at 70% 70%,#302044,#090710 70%)!important;
-}
-
-.wallpaper-red{
-  background:radial-gradient(ellipse at 70% 70%,#421b25,#10080b 70%)!important;
-}
-
-.wallpaper-black{
-  background:radial-gradient(ellipse at 70% 70%,#181818,#050505 70%)!important;
-}
-
-.settingGroup{
-  padding:12px 0;
-  border-bottom:1px solid #30394a;
-}
-
-.settingGroup label{
-  display:block;
-  font-size:13px;
-  margin-bottom:8px;
-}
-
-.settingGroup select,
-.settingGroup input{
-  width:100%;
-}
-
-.systemCard{
-  background:#202938;
-  border:1px solid #354257;
-  border-radius:7px;
-  padding:13px;
-  margin:10px 0;
-}
-
-.systemCard h4{
-  margin:0 0 8px;
-}
-
-.systemCard p{
-  font-size:12px;
-  color:#bdc9d8;
-}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.wall{height:85px;border:2px solid transparent;border-radius:10px;cursor:pointer}
+.wall.selected{border-color:#d7e5ff;box-shadow:0 0 0 2px #819fd7}
 
 .toast{
-  position:absolute;
-  right:15px;
-  top:15px;
-  z-index:200;
-  background:#202b3b;
-  border:1px solid #52647d;
-  padding:13px;
-  border-radius:7px;
-  width:min(260px,80%);
-  font-size:12px;
-  box-shadow:0 8px 25px #0008;
+  position:absolute;z-index:1200;right:18px;top:18px;
+  background:#182131;border:1px solid var(--line);border-radius:12px;
+  padding:12px 16px;box-shadow:var(--shadow);font-size:12px;
 }
-
-.powerMenu{
-  position:absolute;
-  z-index:150;
-  bottom:48px;
-  right:10px;
-  background:#182130;
-  border:1px solid #39475b;
-  border-radius:8px;
-  padding:10px;
-  width:190px;
-}
-
-.powerMenu button{
-  display:block;
-  width:100%;
-  padding:10px;
-  color:white;
-  background:transparent;
-  border:0;
-  text-align:left;
-}
-
-.powerMenu button:hover{
-  background:#2b3a50;
-}
-
-.storeSearch{
-  margin-bottom:12px;
-}
-
-.storeCard{
-  background:#202938;
-  border:1px solid #354257;
-  border-radius:8px;
-  padding:13px;
-  margin-bottom:10px;
-}
-
-.storeCard h4{
-  margin:0 0 7px;
-}
-
-.storeCard p{
-  color:#aebbd0;
-  font-size:12px;
-  line-height:1.5;
-}
-
-.storeCard button{
-  margin-top:7px;
-}
-
-.storeStatus{
-  font-size:11px;
-  color:#8fa8c8;
-}
-
-/* BROWSER */
-
-.browserToolbar{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:8px;
-  background:#151515;
-  border-bottom:1px solid #333;
-  flex-shrink:0;
-}
-
-.browserToolbar button{
-  background:#292929;
-  color:white;
-  border:1px solid #444;
-  padding:7px 10px;
-  border-radius:5px;
-  flex-shrink:0;
-}
-
-.browserToolbar input{
-  flex:1;
-  min-width:0;
-  width:auto;
-  margin:0;
-  background:#222;
-  color:white;
-  border:1px solid #444;
-  padding:7px;
-  border-radius:5px;
-}
-
-.browserFrame{
-  width:100%;
-  flex:1;
-  min-height:0;
-  border:none;
-  background:white;
-}
-
-@media(max-width:500px){
-  #desktop{
-    padding:12px;
-  }
-
-  .browserToolbar{
-    gap:3px;
-    padding:5px;
-  }
-
-  .browserToolbar button{
-    padding:7px 6px;
-    font-size:11px;
-  }
-
+@media(max-width:650px){
+  .desktop-brand{top:18px;left:18px}
+  #desktopIcons{top:75px;left:8px;grid-template-columns:repeat(2,72px)}
   .window{
-    max-width:96vw;
+    left:8px!important;top:65px!important;
+    width:calc(100vw - 16px)!important;
+    height:calc(100dvh - 150px)!important;
+    max-width:none;max-height:none;
   }
+  .window.maximized{top:8px!important;height:calc(100dvh - 91px)!important}
+  .status{gap:6px;padding:0 4px}
+  .status .optional{display:none}
+  #taskbar{bottom:7px;height:54px;padding:5px 7px;gap:3px}
+  .task-app,.start-button{min-width:36px;height:38px}
+  .clock{font-size:9px}
+  .clock b{font-size:10px}
+  .file-layout{grid-template-columns:95px 1fr}
+  .file-side button{font-size:10px;padding:8px 5px}
+  .window-content{padding:12px}
 }
 </style>
 </head>
 
 <body>
+<div id="desktop">
 
-<div id="topbar">
-  <strong>◈ SHADOW OS</strong>
-  <span id="topDate"></span>
-</div>
-
-<main id="desktop">
-
-  <div class="icon" onclick="openApp('computer')">
-    <span>🖥️</span>My Computer
+  <div class="desktop-brand">
+    <strong>SHADOW<span style="color:#9bb7ed">OS</span></strong>
+    <small>PERSONAL DESKTOP ENVIRONMENT</small>
   </div>
 
-  <div class="icon" onclick="openApp('files')">
-    <span>📁</span>File Manager
+  <div id="desktopIcons"></div>
+  <div id="windows"></div>
+
+  <div id="startMenu">
+    <div class="start-head">
+      <strong>SHADOWOS APPLICATIONS</strong>
+      <span class="muted">v1.0</span>
+    </div>
+    <input id="appSearch" class="search" placeholder="Search applications..." oninput="filterApps(this.value)">
+    <div class="app-grid" id="appGrid"></div>
   </div>
 
-  <div class="icon" onclick="openApp('notes')">
-    <span>📝</span>Notes
+  <div id="quickPanel">
+    <div class="row between" style="margin-bottom:13px">
+      <b>Quick Settings</b>
+      <span class="muted" id="quickDate"></span>
+    </div>
+    <div class="quick-grid">
+      <button onclick="toast('Network connected')">◉ Network<br><small class="muted">Connected</small></button>
+      <button onclick="toggleTheme()">◐ Appearance<br><small class="muted">Dark mode</small></button>
+      <button onclick="toast('Focus assist enabled')">☾ Focus assist</button>
+      <button onclick="toast('Bluetooth is unavailable in this browser')">ᛒ Bluetooth</button>
+    </div>
+    <p class="muted" style="font-size:11px">Volume</p>
+    <input type="range" min="0" max="100" value="65" style="width:100%">
   </div>
 
-  <div class="icon" onclick="openApp('calculator')">
-    <span>🧮</span>Calculator
+  <div id="taskbar">
+    <button class="start-button" title="Start" onclick="toggleStart()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>
+      </svg>
+    </button>
+
+    <div class="task-divider"></div>
+    <div id="taskApps" class="row"></div>
+    <div class="task-divider"></div>
+
+    <div class="status">
+      <span title="Network">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 9a15 15 0 0 1 18 0M6 12a10 10 0 0 1 12 0m-9 3a5 5 0 0 1 6 0m-3 4h.01"/>
+        </svg>
+      </span>
+      <span class="optional" id="pingLabel">-- ms</span>
+      <span class="optional" id="batteryLabel">—%</span>
+      <button title="Quick settings" onclick="toggleQuick()">⌄</button>
+    </div>
+
+    <div class="clock" id="clock">
+      <b>--:--</b>
+      <span>--/--/----</span>
+    </div>
   </div>
-
-  <div class="icon" onclick="openApp('settings')">
-    <span>⚙️</span>Settings
-  </div>
-
-  <div class="icon" onclick="openApp('about')">
-    <span>◈</span>About
-  </div>
-
-  <div class="icon" onclick="openApp('system')">
-    <span>🖥️</span>System
-  </div>
-
-  <div class="icon" onclick="openApp('appstore')">
-    <span>🛒</span>App Store
-  </div>
-
-  <div class="icon" onclick="openApp('browser')">
-    <span>🌐</span>Browser
-  </div>
-
-  <div id="wallpaper">SHADOW</div>
-</main>
-
-<div id="taskbar">
-  <button id="startBtn" onclick="toggleStart()">◈ Start</button>
-  <div id="appTasks"></div>
-  <span id="clock"></span>
-</div>
-
-<div id="startMenu">
-  <strong style="display:block;padding:8px 10px">Applications</strong>
-
-  <button onclick="openApp('computer');toggleStart()">🖥️ My Computer</button>
-  <button onclick="openApp('files');toggleStart()">📁 File Manager</button>
-  <button onclick="openApp('notes');toggleStart()">📝 Notes</button>
-  <button onclick="openApp('calculator');toggleStart()">🧮 Calculator</button>
-  <button onclick="openApp('settings');toggleStart()">⚙️ Settings</button>
-  <button onclick="openApp('about');toggleStart()">◈ About</button>
-  <button onclick="openApp('system');toggleStart()">🖥️ System</button>
-  <button onclick="openApp('appstore');toggleStart()">🛒 App Store</button>
-  <button onclick="openApp('browser');toggleStart()">🌐 Browser</button>
 </div>
 
 <script>
-const desktop=document.getElementById("desktop");
+const I = {
+files:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10h18"/></svg>`,
+browser:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>`,
+calc:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 6h8M8 11h2m4 0h2m-8 4h2m4 0h2m-8 3h2m4 0h2"/></svg>`,
+store:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8h16l-1 12H5L4 8zM3 8l2-5h14l2 5M9 11v2a3 3 0 0 0 6 0v-2"/></svg>`,
+settings:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.6.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.6-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.9l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.6-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.6.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1-.1 1.8z"/></svg>`,
+music:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 18V5l12-2v13M9 9l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+gallery:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`,
+terminal:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m5 0h5"/></svg>`,
+calendar:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>`
+};
 
-let highestZ=10;
-let currentPath=[];
-let editingId=null;
+const APPS=[
+  ['files','File Manager'],
+  ['browser','Browser'],
+  ['calc','Calculator'],
+  ['store','App Store'],
+  ['settings','Settings'],
+  ['music','Music'],
+  ['gallery','Gallery'],
+  ['terminal','Terminal'],
+  ['calendar','Calendar']
+];
 
-const STORAGE="shadow_os_files_v03";
+const winRoot=document.getElementById('windows');
+let z=30,active=null,winCount=0;
+let files=JSON.parse(localStorage.getItem('shadow_files')||'[]');
+let installed=JSON.parse(localStorage.getItem('shadow_apps')||'["files","browser","calc","store","settings"]');
 
-function initialFiles(){
-  return [
-    {id:"f1",name:"Documents",type:"folder",parent:"root"},
-    {id:"f2",name:"Pictures",type:"folder",parent:"root"},
-    {id:"f3",name:"Downloads",type:"folder",parent:"root"},
-    {
-      id:"f4",
-      name:"Readme.txt",
-      type:"file",
-      parent:"root",
-      content:"Welcome to SHADOW OS.\n\nThis is your virtual file system."
-    }
-  ];
+function appIcon(id){return I[id]||I.terminal}
+
+function toast(msg){
+  let t=document.createElement('div');
+  t.className='toast';
+  t.textContent=msg;
+  document.getElementById('desktop').append(t);
+  setTimeout(()=>t.remove(),2600);
 }
 
-function loadFiles(){
-  try{
-    const data=JSON.parse(localStorage.getItem(STORAGE));
-    return Array.isArray(data)?data:initialFiles();
-  }catch(e){
-    return initialFiles();
-  }
+function toggleStart(){
+  document.getElementById('startMenu').classList.toggle('show');
+  document.getElementById('quickPanel').classList.remove('show');
 }
 
-let files=loadFiles();
-
-function saveFiles(){
-  localStorage.setItem(STORAGE,JSON.stringify(files));
+function toggleQuick(){
+  document.getElementById('quickPanel').classList.toggle('show');
+  document.getElementById('startMenu').classList.remove('show');
+  document.getElementById('quickDate').textContent=new Date().toLocaleDateString('id-ID');
 }
 
-function makeId(){
-  return "file_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
+function filterApps(q){renderAppGrid(q.toLowerCase())}
+
+function renderAppGrid(q=''){
+  document.getElementById('appGrid').innerHTML=APPS
+    .filter(a=>a[1].toLowerCase().includes(q))
+    .map(a=>`<button class="app-tile" onclick="openApp('${a[0]}');toggleStart()">${appIcon(a[0])}<span>${a[1]}</span></button>`)
+    .join('');
 }
 
-function currentParent(){
-  return currentPath.length
-    ?currentPath[currentPath.length-1]
-    :"root";
-}
-
-function getFolder(id){
-  return files.find(f=>f.id===id&&f.type==="folder");
-}
-
-/* WINDOW MANAGER */
-
-function openApp(name){
-  const old=document.getElementById("window-"+name);
-
-  if(old){
-    focusWindow(old);
-    return;
-  }
-
-  if(name==="browser"){
-    renderBrowser();
-    return;
-  }
-
-  const titles={
-    computer:"My Computer",
-    files:"File Manager",
-    notes:"Notes",
-    calculator:"Calculator",
-    settings:"Settings",
-    about:"About SHADOW OS",
-    system:"System Information",
-    appstore:"SHADOW App Store"
-  };
-
-  if(!titles[name])return;
-
-  const win=document.createElement("section");
-  win.className="window";
-  win.id="window-"+name;
-  win.style.zIndex=++highestZ;
-
-  win.innerHTML=`
-    <div class="titlebar">
-      <strong>${titles[name]}</strong>
-
-      <div class="controls">
-        <button onclick="minimizeApp('${name}')">−</button>
-        <button onclick="maximizeApp('${name}')">□</button>
-        <button class="close" onclick="closeApp('${name}')">×</button>
-      </div>
-    </div>
-
-    <div class="content" id="content-${name}"></div>
-  `;
-
-  desktop.appendChild(win);
-
-  win.addEventListener("pointerdown",()=>{
-    focusWindow(win);
-  });
-
-  focusWindow(win);
-  dragWindow(win);
-
-  if(name==="files")renderFiles();
-  if(name==="computer")renderComputer();
-  if(name==="notes")renderNotes();
-  if(name==="calculator")renderCalculator();
-  if(name==="settings")renderSettings();
-  if(name==="about")renderAbout();
-  if(name==="system")renderSystem();
-  if(name==="appstore")renderAppStore();
-}
-
-function closeApp(name){
-  document.getElementById("window-"+name)?.remove();
-  updateTaskbar();
-}
-
-function minimizeApp(name){
-  document.getElementById("window-"+name)?.classList.add("hidden");
-  updateTaskbar();
-}
-
-function maximizeApp(name){
-  const win=document.getElementById("window-"+name);
-  if(!win)return;
-
-  win.classList.toggle("maximized");
-  focusWindow(win);
-}
-
-function focusWindow(win){
-  if(!win)return;
-
-  document.querySelectorAll(".window").forEach(w=>{
-    w.classList.remove("activeWindow");
-  });
-
-  win.classList.remove("hidden");
-  win.style.zIndex=++highestZ;
-  win.classList.add("activeWindow");
-
-  updateTaskbar();
+function renderDesktop(){
+  document.getElementById('desktopIcons').innerHTML=APPS.slice(0,5)
+    .map(a=>`<button class="desk-icon" onclick="openApp('${a[0]}')">${appIcon(a[0])}<span>${a[1]}</span></button>`)
+    .join('');
 }
 
 function updateTaskbar(){
-  const taskbar=document.getElementById("appTasks");
-  taskbar.innerHTML="";
-
-  document.querySelectorAll(".window").forEach(win=>{
-    const name=win.id.replace("window-","");
-    const title=win.querySelector(".titlebar strong")?.textContent||name;
-
-    const button=document.createElement("button");
-    button.className="taskBtn";
-    button.textContent=title;
-
-    if(
-      !win.classList.contains("hidden") &&
-      Number(win.style.zIndex)===highestZ
-    ){
-      button.classList.add("active");
-    }
-
-    button.onclick=()=>{
-      if(win.classList.contains("hidden")){
-        focusWindow(win);
-      }else if(Number(win.style.zIndex)===highestZ){
-        minimizeApp(name);
-      }else{
-        focusWindow(win);
-      }
-
-      updateTaskbar();
-    };
-
-    taskbar.appendChild(button);
-  });
+  document.getElementById('taskApps').innerHTML=
+    [...winRoot.querySelectorAll('.window')].map(w=>
+      `<button class="task-app ${w===active?'active':''}" title="${w.dataset.title}" onclick="restoreWindow('${w.id}')">${appIcon(w.dataset.app)}</button>`
+    ).join('');
 }
 
-function dragWindow(win){
-  const bar=win.querySelector(".titlebar");
-  if(!bar)return;
+function focusWindow(w){
+  if(!w)return;
+  active=w;
+  z++;
+  w.style.zIndex=z;
+  document.querySelectorAll('.window').forEach(x=>x.classList.toggle('focused',x===w));
+  updateTaskbar();
+}
 
-  let dragging=false;
-  let offsetX=0;
-  let offsetY=0;
+function restoreWindow(id){
+  let w=document.getElementById(id);
+  if(w){w.style.display='flex';focusWindow(w)}
+}
 
-  bar.addEventListener("pointerdown",e=>{
-    if(e.target.closest("button"))return;
-    if(win.classList.contains("maximized"))return;
+function createWindow(app,title,content,width=590,height=410){
+  let old=[...winRoot.querySelectorAll('.window')].find(w=>w.dataset.app===app);
+  if(old){restoreWindow(old.id);return old}
 
-    dragging=true;
+  let w=document.createElement('section');
+  w.className='window';
+  w.id='win'+(++winCount);
+  w.dataset.app=app;
+  w.dataset.title=title;
 
-    offsetX=e.clientX-win.offsetLeft;
-    offsetY=e.clientY-win.offsetTop;
+  w.style.width=`min(${width}px,calc(100vw - 20px))`;
+  w.style.height=`min(${height}px,calc(100dvh - 100px))`;
+  w.style.left=Math.max(12,Math.min(innerWidth-width-12,100+winCount*24))+'px';
+  w.style.top=Math.max(12,Math.min(innerHeight-height-90,65+winCount*20))+'px';
 
-    focusWindow(win);
+  w.innerHTML=`
+    <header class="titlebar">
+      <div class="window-title">${appIcon(app)}<span>${title}</span></div>
+      <div class="win-actions">
+        <button title="Minimize" onclick="minimizeWindow('${w.id}')">−</button>
+        <button title="Maximize" onclick="maximizeWindow('${w.id}')">□</button>
+        <button class="close" title="Close" onclick="closeWindow('${w.id}')">×</button>
+      </div>
+    </header>
+    <div class="window-content">${content}</div>
+    <div class="resize-handle"></div>
+  `;
 
+  winRoot.append(w);
+  focusWindow(w);
+  makeDraggable(w);
+  makeResizable(w);
+  return w;
+}
+
+function closeWindow(id){
+  let w=document.getElementById(id);
+  if(w)w.remove();
+  active=[...winRoot.querySelectorAll('.window')].pop()||null;
+  if(active)focusWindow(active);
+  else updateTaskbar();
+}
+
+function minimizeWindow(id){
+  let w=document.getElementById(id);
+  if(w)w.style.display='none';
+  active=null;
+  updateTaskbar();
+}
+
+function maximizeWindow(id){
+  let w=document.getElementById(id);
+  if(!w)return;
+
+  if(w.classList.contains('maximized')){
+    w.classList.remove('maximized');
+    w.style.left=w.dataset.left;
+    w.style.top=w.dataset.top;
+    w.style.width=w.dataset.width;
+    w.style.height=w.dataset.height;
+  }else{
+    w.dataset.left=w.style.left;
+    w.dataset.top=w.style.top;
+    w.dataset.width=w.style.width;
+    w.dataset.height=w.style.height;
+    w.classList.add('maximized');
+  }
+  focusWindow(w);
+}
+
+function snapWindow(w,side){
+  w.classList.remove('maximized');
+  w.classList.add('snapped');
+  w.style.top='10px';
+  w.style.height='calc(100dvh - 91px)';
+  w.style.width='calc(50vw - 15px)';
+  w.style.left=side==='left'?'10px':'calc(50vw + 5px)';
+  focusWindow(w);
+}
+
+function makeDraggable(w){
+  let bar=w.querySelector('.titlebar');
+  let sx,sy,l,t,drag=false;
+
+  bar.addEventListener('pointerdown',e=>{
+    if(e.target.closest('button'))return;
+    if(w.classList.contains('maximized'))return;
+    drag=true;
+    focusWindow(w);
+    sx=e.clientX;sy=e.clientY;
+    l=w.offsetLeft;t=w.offsetTop;
     bar.setPointerCapture(e.pointerId);
   });
 
-  bar.addEventListener("pointermove",e=>{
-    if(!dragging)return;
-
-    const maxLeft=desktop.clientWidth-win.offsetWidth;
-    const maxTop=desktop.clientHeight-win.offsetHeight;
-
-    win.style.left=Math.max(
-      0,
-      Math.min(maxLeft,e.clientX-offsetX)
-    )+"px";
-
-    win.style.top=Math.max(
-      0,
-      Math.min(maxTop,e.clientY-offsetY)
-    )+"px";
+  bar.addEventListener('pointermove',e=>{
+    if(!drag)return;
+    let x=l+e.clientX-sx;
+    let y=t+e.clientY-sy;
+    w.style.left=Math.max(0,Math.min(innerWidth-w.offsetWidth,x))+'px';
+    w.style.top=Math.max(0,Math.min(innerHeight-80,y))+'px';
   });
 
-  bar.addEventListener("pointerup",()=>{
-    dragging=false;
-  });
-
-  bar.addEventListener("pointercancel",()=>{
-    dragging=false;
+  bar.addEventListener('pointerup',e=>{
+    if(!drag)return;
+    drag=false;
+    if(e.clientX<18)snapWindow(w,'left');
+    else if(e.clientX>innerWidth-18)snapWindow(w,'right');
   });
 }
 
-/* START MENU */
+function makeResizable(w){
+  let h=w.querySelector('.resize-handle');
 
-function toggleStart(){
-  const menu=document.getElementById("startMenu");
+  h.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    focusWindow(w);
 
-  menu.style.display=
-    menu.style.display==="block"?"none":"block";
-}
+    let sx=e.clientX,sy=e.clientY;
+    let sw=w.offsetWidth,sh=w.offsetHeight;
 
-/* MY COMPUTER */
+    h.setPointerCapture(e.pointerId);
 
-function renderComputer(){
-  document.getElementById("content-computer").innerHTML=`
-    <h3>My Computer</h3>
-    <p class="note">SHADOW OS Virtual System</p>
+    let move=ev=>{
+      w.style.width=Math.max(280,Math.min(innerWidth-w.offsetLeft,sw+ev.clientX-sx))+'px';
+      w.style.height=Math.max(190,Math.min(innerHeight-w.offsetTop-80,sh+ev.clientY-sy))+'px';
+    };
 
-    <div class="fileitem">
-      💾
-      <span class="filename">Local Storage</span>
-      <small>Browser</small>
-    </div>
+    let up=()=>{
+      h.removeEventListener('pointermove',move);
+      h.removeEventListener('pointerup',up);
+    };
 
-    <div class="fileitem">
-      📁
-      <span class="filename">Virtual Files</span>
-      <small>${files.length} items</small>
-    </div>
-
-    <p class="note">
-      File Manager menggunakan penyimpanan browser,
-      bukan penyimpanan asli perangkat.
-    </p>
-  `;
-}
-
-/* FILE MANAGER */
-
-function renderFiles(){
-  const content=document.getElementById("content-files");
-  if(!content)return;
-
-  const parent=currentParent();
-
-  content.innerHTML=`
-    <div class="toolbar">
-      <button class="action" onclick="goBack()">← Back</button>
-      <button class="action" onclick="createFolder()">＋ Folder</button>
-      <button class="action" onclick="createTextFile()">＋ Text File</button>
-      <button class="action" onclick="refreshFiles()">↻ Refresh</button>
-    </div>
-
-    <div id="path">
-      📁 ${currentPath.length
-        ?currentPath.map(id=>getFolder(id)?.name||"Folder").join(" / ")
-        :"Home"}
-    </div>
-
-    <div id="fileList"></div>
-
-    <div id="editor">
-      <h3 id="editorTitle">Text Editor</h3>
-
-      <textarea id="fileText" placeholder="Tulis sesuatu..."></textarea>
-
-      <div id="editorActions">
-        <button class="action" onclick="saveTextFile()">Save</button>
-        <button class="action" onclick="closeEditor()">Cancel</button>
-      </div>
-    </div>
-  `;
-
-  const list=document.getElementById("fileList");
-  const children=files.filter(f=>f.parent===parent);
-
-  if(children.length===0){
-    list.innerHTML='<div class="empty">Folder ini masih kosong.</div>';
-  }else{
-    children.sort((a,b)=>
-      a.type===b.type
-        ?a.name.localeCompare(b.name)
-        :a.type==="folder"?-1:1
-    );
-
-    children.forEach(file=>{
-      const item=document.createElement("div");
-      item.className="fileitem";
-      item.dataset.fileId=file.id;
-
-      const icon=document.createElement("span");
-      icon.textContent=file.type==="folder"?"📁":"📄";
-
-      const filename=document.createElement("span");
-      filename.className="filename";
-      filename.textContent=file.name;
-
-      const type=document.createElement("small");
-      type.textContent=file.type==="folder"?"Folder":"Text File";
-
-      item.append(icon,filename,type);
-
-      item.addEventListener("click",()=>{
-        selectFile(file.id);
-      });
-
-      item.addEventListener("dblclick",()=>{
-        if(file.type==="file")openFile(file.id);
-      });
-
-      list.appendChild(item);
-    });
-  }
-}
-
-function selectFile(id){
-  const file=files.find(f=>f.id===id);
-  if(!file)return;
-
-  if(file.type==="folder"){
-    currentPath.push(file.id);
-    renderFiles();
-  }else{
-    openFile(id);
-  }
-}
-
-function openFile(id){
-  const file=files.find(f=>f.id===id&&f.type==="file");
-  if(!file)return;
-
-  editingId=id;
-
-  document.getElementById("fileList").style.display="none";
-  document.querySelector("#content-files .toolbar").style.display="none";
-  document.getElementById("path").style.display="none";
-
-  const editor=document.getElementById("editor");
-  editor.style.display="block";
-
-  document.getElementById("editorTitle").textContent=file.name;
-  document.getElementById("fileText").value=file.content||"";
-}
-
-function closeEditor(){
-  editingId=null;
-  renderFiles();
-}
-
-function saveTextFile(){
-  const file=files.find(f=>f.id===editingId);
-  if(!file)return;
-
-  file.content=document.getElementById("fileText").value;
-
-  saveFiles();
-  closeEditor();
-
-  alert("File berhasil disimpan.");
-}
-
-function createFolder(){
-  const name=prompt("Masukkan nama folder:");
-  if(!name||!name.trim())return;
-
-  const cleanName=name.trim();
-
-  if(files.some(f=>
-    f.parent===currentParent()&&
-    f.name.toLowerCase()===cleanName.toLowerCase()
-  )){
-    alert("Nama tersebut sudah digunakan.");
-    return;
-  }
-
-  files.push({
-    id:makeId(),
-    name:cleanName,
-    type:"folder",
-    parent:currentParent()
+    h.addEventListener('pointermove',move);
+    h.addEventListener('pointerup',up);
   });
-
-  saveFiles();
-  renderFiles();
 }
 
-function createTextFile(){
-  const name=prompt("Nama file, contoh: Catatan.txt");
-  if(!name||!name.trim())return;
+function openApp(id){
+  let title=(APPS.find(a=>a[0]===id)||[id,id])[1];
+  let body='';
 
-  const cleanName=name.trim();
-  const filename=cleanName.endsWith(".txt")
-    ?cleanName
-    :cleanName+".txt";
+  if(id==='calc')body=calcHTML();
+  if(id==='files')body=fileHTML();
+  if(id==='browser')body=browserHTML();
+  if(id==='store')body=storeHTML();
+  if(id==='settings')body=settingsHTML();
 
-  if(files.some(f=>
-    f.parent===currentParent()&&
-    f.name.toLowerCase()===filename.toLowerCase()
-  )){
-    alert("Nama tersebut sudah digunakan.");
-    return;
+  if(id==='terminal')body=terminalHTML();
+
+  if(id==='calendar'){
+    body=`<h2>Calendar</h2><div class="panel">
+      <h1>${new Date().toLocaleDateString('id-ID',{day:'numeric'})}</h1>
+      <b>${new Date().toLocaleDateString('id-ID',{weekday:'long',month:'long',year:'numeric'})}</b>
+    </div>`;
   }
 
-  const id=makeId();
-
-  files.push({
-    id,
-    name:filename,
-    type:"file",
-    parent:currentParent(),
-    content:""
-  });
-
-  saveFiles();
-  renderFiles();
-  openFile(id);
-}
-
-function goBack(){
-  if(currentPath.length){
-    currentPath.pop();
-    renderFiles();
-  }
-}
-
-function refreshFiles(){
-  files=loadFiles();
-  renderFiles();
-}
-
-function renameFile(id){
-  const file=files.find(f=>f.id===id);
-  if(!file)return;
-
-  const name=prompt("Nama baru:",file.name);
-  if(!name||!name.trim())return;
-
-  const cleanName=name.trim();
-
-  if(files.some(f=>
-    f.id!==id&&
-    f.parent===file.parent&&
-    f.name.toLowerCase()===cleanName.toLowerCase()
-  )){
-    alert("Nama tersebut sudah digunakan.");
-    return;
+  if(id==='music'){
+    body=`<div style="text-align:center;padding:35px">
+      <div style="font-size:48px">♫</div>
+      <h2>Shadow Music</h2>
+      <p class="muted">Your local music workspace</p>
+      <input type="file" accept="audio/*" id="audioFile" class="field">
+      <audio id="audioPlayer" controls style="width:100%;margin-top:20px"></audio>
+    </div>`;
   }
 
-  file.name=cleanName;
-  saveFiles();
-  renderFiles();
-}
-
-function deleteFile(id){
-  const file=files.find(f=>f.id===id);
-  if(!file)return;
-
-  if(!confirm("Hapus "+file.name+"?"))return;
-
-  function removeChildren(parentId){
-    files.filter(f=>f.parent===parentId).forEach(child=>{
-      if(child.type==="folder"){
-        removeChildren(child.id);
-      }
-
-      files=files.filter(f=>f.id!==child.id);
-    });
+  if(id==='gallery'){
+    body=`<h2>Gallery</h2>
+      <p class="muted">Open images from your device.</p>
+      <input type="file" accept="image/*" multiple class="field" onchange="previewImages(this)">
+      <div id="galleryPreview" class="store-grid" style="margin-top:12px"></div>`;
   }
 
-  if(file.type==="folder"){
-    removeChildren(id);
+  let w=createWindow(id,title,body,id==='calc'?370:600,id==='calc'?480:440);
+
+  if(id==='calc')initCalc(w);
+  if(id==='files')initFiles(w);
+  if(id==='browser')initBrowser(w);
+  if(id==='store')initStore(w);
+  if(id==='settings')initSettings(w);
+  if(id==='terminal')initTerminal(w);
+
+  if(id==='music'){
+    let inp=w.querySelector('#audioFile');
+    inp.onchange=()=>{
+      let a=w.querySelector('#audioPlayer');
+      a.src=URL.createObjectURL(inp.files[0]);
+    };
   }
 
-  files=files.filter(f=>f.id!==id);
-
-  currentPath=currentPath.filter(pathId=>getFolder(pathId));
-
-  saveFiles();
-  renderFiles();
-}
-
-/* FILE CONTEXT MENU */
-
-document.addEventListener("contextmenu",e=>{
-  const item=e.target.closest("#fileList .fileitem");
-
-  if(!item||!document.getElementById("window-files"))return;
-
-  const fileId=item.dataset.fileId;
-  const file=files.find(f=>f.id===fileId);
-
-  if(!file)return;
-
-  e.preventDefault();
-
-  const choice=prompt(
-    file.name+
-    "\n\n1. Buka\n2. Ganti nama\n3. Hapus\n\nMasukkan angka:"
-  );
-
-  if(choice==="1")selectFile(file.id);
-  if(choice==="2")renameFile(file.id);
-  if(choice==="3")deleteFile(file.id);
-});
-
-/* NOTES */
-
-function renderNotes(){
-  const content=document.getElementById("content-notes");
-  const saved=localStorage.getItem("shadow_notes")||"";
-
-  content.innerHTML=`
-    <h3>Notes</h3>
-
-    <textarea id="notesText" placeholder="Tulis catatan..."></textarea>
-
-    <button class="action" onclick="saveNotes()">Save Notes</button>
-  `;
-
-  document.getElementById("notesText").value=saved;
-}
-
-function saveNotes(){
-  localStorage.setItem(
-    "shadow_notes",
-    document.getElementById("notesText").value
-  );
-
-  alert("Notes saved.");
+  return w;
 }
 
 /* CALCULATOR */
 
-function renderCalculator(){
-  document.getElementById("content-calculator").innerHTML=`
-    <h3>Calculator</h3>
-
-    <input id="calcInput" placeholder="Contoh: 12+5*2">
-
-    <button class="action" onclick="calculate()">Calculate</button>
-
-    <p id="calcResult" class="note">Result: -</p>
-  `;
+function calcHTML(){
+  return `<div class="calc">
+    <div class="calc-screen">
+      <div class="calc-expression" id="calcExpr"></div>
+      <div class="calc-value" id="calcValue">0</div>
+    </div>
+    <div class="calc-grid">
+      ${['AC','±','%','÷','7','8','9','×','4','5','6','−','1','2','3','+','0','.','⌫','=']
+        .map((x,i)=>`<button class="${[3,7,11,15].includes(i)?'op':''} ${x==='='?'equal':''}" data-key="${x}">${x}</button>`)
+        .join('')}
+    </div>
+  </div>`;
 }
 
-function calculate(){
-  const input=document.getElementById("calcInput").value.trim();
-  const result=document.getElementById("calcResult");
+function initCalc(w){
+  let v='0',expr='';
+  const val=w.querySelector('#calcValue');
+  const ex=w.querySelector('#calcExpr');
 
-  if(!input){
-    result.textContent="Masukkan perhitungan.";
-    return;
+  function press(k){
+    if(k==='AC'){v='0';expr=''}
+    else if(k==='⌫'){v=v.length>1?v.slice(0,-1):'0'}
+    else if(k==='='){
+      try{
+        let s=(expr+v).replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+        if(!/^[0-9+\-*/%.() ]+$/.test(s))throw 0;
+        let n=Function('"use strict";return ('+s+')')();
+        if(!Number.isFinite(n))throw 0;
+        expr=s+' =';
+        v=String(Number(n.toPrecision(11)));
+      }catch{
+        expr='Invalid expression';
+        v='0';
+      }
+    }
+    else if(['+','−','×','÷','%'].includes(k)){expr+=v+k;v='0'}
+    else if(k==='±'){v=String(-Number(v))}
+    else if(k==='.' ){if(!v.includes('.'))v+='.'}
+    else{v=v==='0'?k:v+k}
+
+    val.textContent=v;
+    ex.textContent=expr;
   }
 
-  if(!/^[0-9+\-*/().%\s]+$/.test(input)){
-    result.textContent="Input tidak valid.";
-    return;
+  w.querySelectorAll('[data-key]').forEach(b=>{
+    b.onclick=()=>press(b.dataset.key);
+  });
+}
+
+/* FILE MANAGER */
+
+function fileHTML(){
+  return `<div class="file-layout">
+    <aside class="file-side">
+      <p class="section-title">Places</p>
+      <button>⌂ Home</button>
+      <button>▣ Documents</button>
+      <button>▧ Downloads</button>
+      <button>☆ Favorites</button>
+    </aside>
+    <div class="file-main">
+      <div class="file-tools">
+        <button class="secondary" id="newFolder">＋ Folder</button>
+        <button class="secondary" id="newFile">＋ File</button>
+      </div>
+      <div class="file-list" id="fileList"></div>
+    </div>
+  </div>`;
+}
+
+function initFiles(w){
+  let list=w.querySelector('#fileList');
+
+  function draw(){
+    list.innerHTML=files.map((f,i)=>`
+      <div class="file-item" data-i="${i}">
+        ${I.files}
+        <div>${escapeHTML(f.name)}</div>
+        <small class="muted">${f.type}</small>
+      </div>
+    `).join('')||'<p class="muted">This folder is empty.</p>';
+
+    list.querySelectorAll('.file-item').forEach(el=>{
+      el.onclick=()=>{
+        let f=files[+el.dataset.i];
+        if(f.type==='File'){
+          let name=prompt('Edit file',f.name);
+          if(name!==null){
+            f.name=name;
+            save();
+            draw();
+          }
+        }else toast(f.name+' opened');
+      };
+    });
   }
 
-  try{
-    const value=Function('"use strict";return ('+input+')')();
-
-    result.textContent=
-      "Result: "+(Number.isFinite(value)?value:"Error");
-  }catch(e){
-    result.textContent="Expression error.";
+  function save(){
+    localStorage.setItem('shadow_files',JSON.stringify(files));
   }
-}
 
-/* SETTINGS */
-
-function renderSettings(){
-  document.getElementById("content-settings").innerHTML=`
-    <h3>⚙️ Personalization</h3>
-
-    <div class="settingGroup">
-      <label>Desktop Wallpaper</label>
-
-      <select id="wallpaperChoice" onchange="applyAppearance()">
-        <option value="black">Shadow Black</option>
-        <option value="blue">Midnight Blue</option>
-        <option value="purple">Dark Purple</option>
-        <option value="red">Crimson Night</option>
-      </select>
-    </div>
-
-    <div class="settingGroup">
-      <label>Wallpaper Text Size</label>
-
-      <input
-        id="wallpaperSize"
-        type="range"
-        min="40"
-        max="150"
-        value="110"
-        oninput="applyAppearance()"
-      >
-    </div>
-
-    <div class="settingGroup">
-      <label>Wallpaper Text</label>
-
-      <input
-        id="wallpaperText"
-        maxlength="20"
-        placeholder="SHADOW"
-        oninput="applyAppearance()"
-      >
-    </div>
-
-    <div class="settingGroup">
-      <button class="action" onclick="resetAppearance()">
-        Reset Appearance
-      </button>
-    </div>
-  `;
-
-  loadAppearance();
-}
-
-function applyAppearance(){
-  const desktop=document.getElementById("desktop");
-  const wallpaper=document.getElementById("wallpaper");
-
-  const color=document.getElementById("wallpaperChoice").value;
-  const size=document.getElementById("wallpaperSize").value;
-  const text=document.getElementById("wallpaperText").value;
-
-  desktop.classList.remove(
-    "wallpaper-black",
-    "wallpaper-blue",
-    "wallpaper-purple",
-    "wallpaper-red"
-  );
-
-  desktop.classList.add("wallpaper-"+color);
-
-  wallpaper.style.fontSize=size+"px";
-  wallpaper.textContent=text.trim()||"SHADOW";
-
-  const settings={color,size,text};
-
-  localStorage.setItem(
-    "shadow_appearance",
-    JSON.stringify(settings)
-  );
-}
-
-function loadAppearance(){
-  let settings={
-    color:"black",
-    size:110,
-    text:"SHADOW"
+  w.querySelector('#newFolder').onclick=()=>{
+    let n=prompt('Folder name');
+    if(n){files.push({name:n,type:'Folder'});save();draw()}
   };
 
-  try{
-    settings=JSON.parse(
-      localStorage.getItem("shadow_appearance")
-    )||settings;
-  }catch(e){}
+  w.querySelector('#newFile').onclick=()=>{
+    let n=prompt('File name');
+    if(n){files.push({name:n,type:'File'});save();draw()}
+  };
 
-  const validColors=["black","blue","purple","red"];
+  draw();
+}
 
-  if(!validColors.includes(settings.color)){
-    settings.color="black";
+/* BROWSER */
+
+function browserHTML(){
+  return `<div class="browser-top">
+    <input id="browserAddress" class="field" placeholder="Enter website address">
+    <button class="primary" id="browserGo">Go</button>
+    <button class="secondary" id="browserExternal">↗</button>
+  </div>
+  <iframe class="browser-frame" id="browserFrame"
+    sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
+    referrerpolicy="no-referrer"></iframe>
+  <p class="muted" style="font-size:10px">
+    Some websites block embedded viewing. Use ↗ to open them in a new tab.
+  </p>`;
+}
+
+function initBrowser(w){
+  let input=w.querySelector('#browserAddress');
+  let frame=w.querySelector('#browserFrame');
+
+  function go(){
+    let u=input.value.trim();
+    if(!u)return;
+    if(!/^https?:\/\//i.test(u))u='https://'+u;
+
+    try{
+      let url=new URL(u);
+      if(!['http:','https:'].includes(url.protocol))throw 0;
+      input.value=url.href;
+      frame.src=url.href;
+    }catch{toast('Invalid address')}
   }
 
-  document.getElementById("wallpaperChoice").value=settings.color;
-  document.getElementById("wallpaperSize").value=settings.size;
-  document.getElementById("wallpaperText").value=settings.text;
+  w.querySelector('#browserGo').onclick=go;
+  input.onkeydown=e=>{if(e.key==='Enter')go()};
 
-  applyAppearance();
-}
+  w.querySelector('#browserExternal').onclick=()=>{
+    let u=input.value.trim();
+    if(u)window.open(/^https?:\/\//i.test(u)?u:'https://'+u,'_blank','noopener,noreferrer');
+  };
 
-function resetAppearance(){
-  localStorage.removeItem("shadow_appearance");
-  loadAppearance();
-}
-
-/* ABOUT */
-
-function renderAbout(){
-  document.getElementById("content-about").innerHTML=`
-    <h2>◈ SHADOW OS</h2>
-    <p class="note">Version 0.9</p>
-    <p class="note">A browser-based virtual desktop environment.</p>
-    <p class="note">Created for experimentation and learning.</p>
-  `;
-}
-
-/* SYSTEM INFORMATION */
-
-function renderSystem(){
-  const content=document.getElementById("content-system");
-
-  const used=new Blob([
-    JSON.stringify(files),
-    localStorage.getItem("shadow_notes")||"",
-    localStorage.getItem("shadow_appearance")||"",
-    localStorage.getItem(STORE_KEY)||""
-  ]).size;
-
-  const kb=(used/1024).toFixed(2);
-
-  content.innerHTML=`
-    <h3>🖥️ System Information</h3>
-
-    <div class="systemCard">
-      <h4>SHADOW OS</h4>
-      <p>Version: 0.9</p>
-      <p>Platform: Web Browser</p>
-      <p>Status: Running</p>
-    </div>
-
-    <div class="systemCard">
-      <h4>💾 Virtual Storage</h4>
-      <p>Stored data: ${kb} KB</p>
-      <p>Virtual files: ${files.length}</p>
-      <p>Storage type: Browser Local Storage</p>
-    </div>
-
-    <div class="systemCard">
-      <h4>⚙️ System Actions</h4>
-
-      <button class="action" onclick="showNotification('SHADOW OS','System berjalan normal.')">
-        Test Notification
-      </button>
-
-      <button class="action" onclick="clearTemporaryData()">
-        Clear Temporary Data
-      </button>
-
-      <button class="action" onclick="showPowerMenu()">
-        Power Options
-      </button>
-    </div>
-  `;
-}
-
-function showNotification(title,message){
-  document.getElementById("systemToast")?.remove();
-
-  const toast=document.createElement("div");
-  toast.id="systemToast";
-  toast.className="toast";
-
-  const heading=document.createElement("strong");
-  heading.textContent=title;
-
-  const body=document.createElement("p");
-  body.textContent=message;
-
-  toast.append(heading,body);
-  desktop.appendChild(toast);
-
-  setTimeout(()=>{
-    toast.remove();
-  },3500);
-}
-
-function clearTemporaryData(){
-  if(!confirm("Bersihkan data sementara SHADOW OS?"))return;
-
-  showNotification(
-    "System Cleaner",
-    "Tidak ada data sementara yang perlu dibersihkan."
-  );
-}
-
-function showPowerMenu(){
-  document.getElementById("powerMenu")?.remove();
-
-  const menu=document.createElement("div");
-  menu.id="powerMenu";
-  menu.className="powerMenu";
-
-  menu.innerHTML=`
-    <button onclick="restartShadow()">↻ Restart SHADOW OS</button>
-
-    <button onclick="showNotification('Power','SHADOW OS masih berjalan di browser.')">
-      ⏻ Shut Down
-    </button>
-
-    <button onclick="document.getElementById('powerMenu').remove()">
-      Cancel
-    </button>
-  `;
-
-  desktop.appendChild(menu);
-}
-
-function restartShadow(){
-  if(!confirm("Restart tampilan SHADOW OS?"))return;
-
-  document.querySelectorAll(".window").forEach(win=>{
-    win.remove();
-  });
-
-  currentPath=[];
-  editingId=null;
-
-  document.getElementById("powerMenu")?.remove();
-
-  updateTaskbar();
-
-  showNotification(
-    "SHADOW OS",
-    "Tampilan berhasil dimulai ulang."
-  );
+  input.value='https://example.com';
 }
 
 /* APP STORE */
 
-const STORE_KEY="shadow_os_installed_apps";
+function storeHTML(){
+  return `<h2 style="margin-top:0">Discover applications</h2>
+    <p class="muted">A small collection for your workspace.</p>
+    <div class="store-grid" id="storeGrid"></div>`;
+}
 
-const storeApps=[
-  {
-    id:"music",
-    name:"Shadow Music",
-    icon:"🎵",
-    category:"Entertainment",
-    description:"Pemutar musik virtual SHADOW OS."
-  },
-  {
-    id:"gallery",
-    name:"Shadow Gallery",
-    icon:"🖼️",
-    category:"Media",
-    description:"Galeri untuk melihat koleksi gambar virtual."
-  },
-  {
-    id:"weather",
-    name:"Shadow Weather",
-    icon:"🌦️",
-    category:"Utility",
-    description:"Tampilan informasi cuaca simulasi."
-  },
-  {
-    id:"terminal",
-    name:"Shadow Terminal",
-    icon:"💻",
-    category:"System",
-    description:"Terminal perintah virtual."
-  },
-  {
-    id:"calendar",
-    name:"Shadow Calendar",
-    icon:"📅",
-    category:"Productivity",
-    description:"Kalender sederhana."
-  },
-  {
-    id:"games",
-    name:"Shadow Games",
-    icon:"🎮",
-    category:"Entertainment",
-    description:"Pusat permainan virtual."
-  }
+const STORE=[
+  ['music','Shadow Music','A simple local audio player.'],
+  ['gallery','Gallery','Browse images from your device.'],
+  ['terminal','Terminal','A lightweight command interface.'],
+  ['calendar','Calendar','Date and day overview.']
 ];
 
-function loadInstalledApps(){
-  try{
-    const data=JSON.parse(localStorage.getItem(STORE_KEY));
-    return Array.isArray(data)?data:[];
-  }catch(e){
-    return [];
-  }
-}
+function initStore(w){
+  let g=w.querySelector('#storeGrid');
 
-let installedApps=loadInstalledApps();
+  g.innerHTML=STORE.map(a=>`
+    <div class="store-card">
+      <div class="store-icon">${appIcon(a[0])}</div>
+      <b>${a[1]}</b>
+      <p>${a[2]}</p>
+      <button class="secondary" data-id="${a[0]}">
+        ${installed.includes(a[0])?'Open':'Install'}
+      </button>
+    </div>
+  `).join('');
 
-function saveInstalledApps(){
-  localStorage.setItem(
-    STORE_KEY,
-    JSON.stringify(installedApps)
-  );
-}
-
-function renderAppStore(){
-  const content=document.getElementById("content-appstore");
-  if(!content)return;
-
-  content.innerHTML=`
-    <h3>🛒 SHADOW App Store</h3>
-
-    <p class="note">
-      Discover virtual applications for your system.
-    </p>
-
-    <input
-      class="storeSearch"
-      id="storeSearch"
-      placeholder="Search applications..."
-      oninput="filterStoreApps()"
-    >
-
-    <div id="storeAppList"></div>
-
-    <p class="note">
-      Installed Applications:
-      <strong id="installedCount">0</strong>
-    </p>
-  `;
-
-  filterStoreApps();
-}
-
-function filterStoreApps(){
-  const search=document.getElementById("storeSearch");
-  const list=document.getElementById("storeAppList");
-
-  if(!search||!list)return;
-
-  const keyword=search.value.toLowerCase();
-
-  const results=storeApps.filter(app=>
-    app.name.toLowerCase().includes(keyword)||
-    app.category.toLowerCase().includes(keyword)||
-    app.description.toLowerCase().includes(keyword)
-  );
-
-  list.innerHTML="";
-
-  if(results.length===0){
-    list.innerHTML='<div class="empty">No applications found.</div>';
-  }
-
-  results.forEach(app=>{
-    const installed=installedApps.includes(app.id);
-
-    const card=document.createElement("div");
-    card.className="storeCard";
-
-    const title=document.createElement("h4");
-    title.textContent=app.icon+" "+app.name;
-
-    const category=document.createElement("div");
-    category.className="storeStatus";
-    category.textContent=app.category;
-
-    const description=document.createElement("p");
-    description.textContent=app.description;
-
-    const button=document.createElement("button");
-    button.className="action";
-
-    if(installed){
-      button.textContent="✓ Installed";
-      button.onclick=()=>openStoreApp(app.id);
-    }else{
-      button.textContent="＋ Install";
-      button.onclick=()=>installStoreApp(app.id);
-    }
-
-    const uninstall=document.createElement("button");
-    uninstall.className="action";
-    uninstall.textContent="Uninstall";
-    uninstall.style.marginLeft="7px";
-    uninstall.disabled=!installed;
-    uninstall.style.opacity=installed?"1":"0.4";
-    uninstall.onclick=()=>uninstallStoreApp(app.id);
-
-    card.append(
-      title,
-      category,
-      description,
-      button,
-      uninstall
-    );
-
-    list.appendChild(card);
+  g.querySelectorAll('button').forEach(b=>{
+    b.onclick=()=>{
+      let id=b.dataset.id;
+      if(!installed.includes(id)){
+        installed.push(id);
+        localStorage.setItem('shadow_apps',JSON.stringify(installed));
+        b.textContent='Open';
+        toast('App installed');
+      }else openApp(id);
+    };
   });
-
-  document.getElementById("installedCount").textContent=
-    installedApps.length;
 }
 
-function installStoreApp(id){
-  const app=storeApps.find(a=>a.id===id);
+/* SETTINGS */
 
-  if(!app||installedApps.includes(id))return;
-
-  installedApps.push(id);
-  saveInstalledApps();
-  filterStoreApps();
-
-  showNotification(
-    "App Store",
-    app.name+" berhasil diinstal."
-  );
-}
-
-function uninstallStoreApp(id){
-  const app=storeApps.find(a=>a.id===id);
-
-  if(!app||!installedApps.includes(id))return;
-
-  if(!confirm("Uninstall "+app.name+"?"))return;
-
-  installedApps=installedApps.filter(x=>x!==id);
-  saveInstalledApps();
-
-  document.getElementById("window-storeapp-"+id)?.remove();
-
-  filterStoreApps();
-  updateTaskbar();
-
-  showNotification(
-    "App Store",
-    app.name+" berhasil diuninstall."
-  );
-}
-
-function openStoreApp(id){
-  if(!installedApps.includes(id))return;
-
-  const app=storeApps.find(a=>a.id===id);
-  if(!app)return;
-
-  const windowId="window-storeapp-"+id;
-  const old=document.getElementById(windowId);
-
-  if(old){
-    focusWindow(old);
-    return;
-  }
-
-  const win=document.createElement("section");
-  win.className="window";
-  win.id=windowId;
-  win.style.zIndex=++highestZ;
-
-  win.innerHTML=`
-    <div class="titlebar">
-      <strong>${app.icon} ${app.name}</strong>
-
-      <div class="controls">
-        <button onclick="minimizeApp('storeapp-${id}')">−</button>
-        <button onclick="maximizeApp('storeapp-${id}')">□</button>
-        <button class="close" onclick="closeApp('storeapp-${id}')">×</button>
+function settingsHTML(){
+  return `<h2 style="margin-top:0">Personalization</h2>
+    <p class="muted">Choose a desktop atmosphere.</p>
+    <div class="settings-grid">
+      <div class="panel">
+        <div class="wall selected" data-wall="0" style="background:radial-gradient(at 20% 20%,#344b70,#111722 65%)"></div>
+        <small>Midnight Blue</small>
+      </div>
+      <div class="panel">
+        <div class="wall" data-wall="1" style="background:radial-gradient(at 80% 20%,#315b55,#101b1d 65%)"></div>
+        <small>Deep Forest</small>
+      </div>
+      <div class="panel">
+        <div class="wall" data-wall="2" style="background:radial-gradient(at 50% 80%,#55416d,#171321 65%)"></div>
+        <small>Violet Dusk</small>
+      </div>
+      <div class="panel">
+        <div class="wall" data-wall="3" style="background:linear-gradient(135deg,#303946,#0c1016)"></div>
+        <small>Graphite</small>
       </div>
     </div>
+    <p class="section-title" style="margin-top:20px">Interface</p>
+    <button class="secondary" onclick="toast('Dark appearance is active')">Dark appearance</button>
+    <p class="muted" style="font-size:11px;margin-top:20px">
+      ShadowOS 1.0 · Browser-based desktop
+    </p>`;
+}
 
-    <div class="content">
-      <h3>${app.icon} ${app.name}</h3>
+function initSettings(w){
+  let walls=[
+    'radial-gradient(ellipse at 18% 20%,#283958 0,transparent 38%),radial-gradient(ellipse at 80% 78%,#172c35 0,transparent 40%),linear-gradient(135deg,#101722,#080b11 70%)',
+    'radial-gradient(ellipse at 80% 20%,#315b55,transparent 45%),linear-gradient(135deg,#101b1d,#080d12)',
+    'radial-gradient(ellipse at 50% 80%,#55416d,transparent 50%),linear-gradient(135deg,#171321,#090b12)',
+    'linear-gradient(135deg,#303946,#0c1016)'
+  ];
 
-      <p class="note">${app.description}</p>
-
-      <div class="systemCard">
-        <h4>Application Status</h4>
-        <p>Installed successfully.</p>
-        <p>SHADOW OS Virtual Application</p>
-      </div>
-
-      <p class="note">
-        This application is currently a virtual demonstration.
-      </p>
-    </div>
-  `;
-
-  desktop.appendChild(win);
-
-  win.addEventListener("pointerdown",()=>{
-    focusWindow(win);
+  w.querySelectorAll('.wall').forEach(el=>{
+    el.onclick=()=>{
+      w.querySelectorAll('.wall').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('desktop').style.background=walls[+el.dataset.wall];
+      localStorage.setItem('shadow_wall',el.dataset.wall);
+    };
   });
-
-  focusWindow(win);
-  dragWindow(win);
 }
 
-/* SHADOW BROWSER */
+/* TERMINAL */
 
-function renderBrowser(){
-  const id="window-browser";
-  const old=document.getElementById(id);
-
-  if(old){
-    focusWindow(old);
-    return;
-  }
-
-  const win=document.createElement("section");
-  win.className="window";
-  win.id=id;
-
-  win.style.width="85%";
-  win.style.height="75%";
-  win.style.top="10%";
-  win.style.left="7%";
-
-  win.innerHTML=`
-    <div class="titlebar">
-      <strong>🌐 SHADOW Browser</strong>
-
-      <div class="controls">
-        <button onclick="minimizeApp('browser')">−</button>
-        <button onclick="maximizeApp('browser')">□</button>
-        <button class="close" onclick="closeApp('browser')">×</button>
-      </div>
+function terminalHTML(){
+  return `<div style="font-family:ui-monospace,monospace">
+    <p style="color:#9bb7ed">ShadowOS Terminal [browser simulation]</p>
+    <p class="muted">Type <b>help</b> to view available commands.</p>
+    <div id="termOut"></div>
+    <div class="row">
+      <span style="color:#9bb7ed">user@shadow:~$</span>
+      <input id="termInput" style="flex:1;background:transparent;border:0;color:white;outline:0">
     </div>
+  </div>`;
+}
 
-    <div class="browserToolbar">
-      <button onclick="browserBack()">←</button>
-      <button onclick="browserForward()">→</button>
-      <button onclick="browserReload()">⟳</button>
+function initTerminal(w){
+  let input=w.querySelector('#termInput');
+  let out=w.querySelector('#termOut');
+  input.focus();
 
-      <input
-        id="browserAddress"
-        placeholder="Masukkan alamat website..."
-        onkeydown="if(event.key==='Enter') browserGo()"
-      >
+  input.onkeydown=e=>{
+    if(e.key!=='Enter')return;
+    let c=input.value.trim();
 
-      <button onclick="browserGo()">Go</button>
-      <button onclick="browserExternal()">↗</button>
-    </div>
+    let msg={
+      help:'help · date · clear · apps · version',
+      date:new Date().toString(),
+      apps:APPS.map(a=>a[1]).join(', '),
+      version:'ShadowOS 1.0'
+    }[c]??'Command not found: '+c;
 
-    <iframe
-      id="browserFrame"
-      class="browserFrame"
-      src="about:blank"
-      title="SHADOW Browser"
-    ></iframe>
-  `;
+    if(c==='clear')out.innerHTML='';
+    else out.innerHTML+=`<p style="margin:6px 0">
+      <span style="color:#9bb7ed">$ ${escapeHTML(c)}</span><br>
+      ${escapeHTML(msg)}
+    </p>`;
 
-  desktop.appendChild(win);
+    input.value='';
+  };
+}
 
-  win.addEventListener("pointerdown",()=>{
-    focusWindow(win);
+/* GALLERY */
+
+function previewImages(inp){
+  let target=document.getElementById('galleryPreview');
+  target.innerHTML='';
+
+  [...inp.files].forEach(f=>{
+    let u=URL.createObjectURL(f);
+    let img=document.createElement('img');
+    img.src=u;
+    img.style.cssText='width:100%;height:120px;object-fit:cover;border-radius:10px';
+    target.append(img);
   });
-
-  focusWindow(win);
-  dragWindow(win);
-  updateTaskbar();
 }
 
-function getBrowserURL(){
-  const input=document.getElementById("browserAddress");
-  if(!input)return null;
-
-  let url=input.value.trim();
-  if(!url)return null;
-
-  if(!/^https?:\/\//i.test(url)){
-    url="https://"+url;
-  }
-
-  try{
-    const parsed=new URL(url);
-
-    if(
-      parsed.protocol!=="https:"&&
-      parsed.protocol!=="http:"
-    ){
-      return null;
-    }
-
-    return parsed.href;
-  }catch(e){
-    return null;
-  }
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
 }
 
-function browserGo(){
-  const input=document.getElementById("browserAddress");
-  const frame=document.getElementById("browserFrame");
-
-  if(!input||!frame)return;
-
-  const url=getBrowserURL();
-
-  if(!url){
-    alert("Alamat website tidak valid.");
-    return;
-  }
-
-  input.value=url;
-  frame.src=url;
-}
-
-function browserBack(){
-  const frame=document.getElementById("browserFrame");
-  if(!frame)return;
-
-  try{
-    frame.contentWindow.history.back();
-  }catch(e){}
-}
-
-function browserForward(){
-  const frame=document.getElementById("browserFrame");
-  if(!frame)return;
-
-  try{
-    frame.contentWindow.history.forward();
-  }catch(e){}
-}
-
-function browserReload(){
-  const frame=document.getElementById("browserFrame");
-  if(!frame)return;
-
-  try{
-    frame.contentWindow.location.reload();
-  }catch(e){}
-}
-
-function browserExternal(){
-  const url=getBrowserURL();
-
-  if(!url){
-    alert("Masukkan alamat website yang valid.");
-    return;
-  }
-
-  window.open(url,"_blank","noopener,noreferrer");
-}
-
-/* CLOCK */
+/* STATUS BAR */
 
 function updateClock(){
-  const now=new Date();
-
-  document.getElementById("clock").textContent=
-    now.toLocaleTimeString("id-ID",{
-      hour:"2-digit",
-      minute:"2-digit"
-    });
-
-  document.getElementById("topDate").textContent=
-    now.toLocaleDateString("id-ID",{
-      day:"numeric",
-      month:"short",
-      year:"numeric"
-    });
+  let d=new Date();
+  document.getElementById('clock').innerHTML=`
+    <b>${d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</b>
+    <span>${d.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'})}</span>
+  `;
 }
 
+async function updatePing(){
+  let label=document.getElementById('pingLabel');
+
+  if(!navigator.onLine){
+    label.textContent='Offline';
+    return;
+  }
+
+  try{
+    let start=performance.now();
+    await fetch(location.href,{method:'HEAD',cache:'no-store'});
+    label.textContent=Math.round(performance.now()-start)+' ms';
+  }catch{
+    label.textContent='Online';
+  }
+}
+
+async function battery(){
+  if(navigator.getBattery){
+    try{
+      let b=await navigator.getBattery();
+      let set=()=>document.getElementById('batteryLabel').textContent=Math.round(b.level*100)+'%';
+      set();
+      b.addEventListener('levelchange',set);
+    }catch{
+      document.getElementById('batteryLabel').textContent='—';
+    }
+  }else{
+    document.getElementById('batteryLabel').textContent='—';
+  }
+}
+
+function toggleTheme(){
+  toast('Dark appearance is active');
+}
+
+window.addEventListener('online',()=>toast('Connection restored'));
+window.addEventListener('offline',()=>toast('You are offline'));
+
+renderDesktop();
+renderAppGrid();
 updateClock();
 setInterval(updateClock,1000);
+updatePing();
+setInterval(updatePing,30000);
+battery();
 
+document.addEventListener('pointerdown',e=>{
+  if(!e.target.closest('#startMenu,.start-button')){
+    document.getElementById('startMenu').classList.remove('show');
+  }
+
+  if(!e.target.closest('#quickPanel,.status button')){
+    document.getElementById('quickPanel').classList.remove('show');
+  }
+});
 </script>
 </body>
 </html>

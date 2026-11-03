@@ -4,537 +4,886 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101010">
-<title>SHADOW OS</title>
+<meta name="theme-color" content="#080d16">
+<title>SHADOW OS 0.2</title>
 
 <style>
 :root {
-    --bg: #101010;
-    --panel: #1b1b1b;
-    --border: #383838;
-    --text: #eeeeee;
-    --muted: #999999;
+  --bg: #080d16;
+  --panel: #111b2a;
+  --line: #29394f;
+  --text: #eaf0f8;
+  --muted: #8b9bb1;
+  --accent: #8caeff;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
-    width: 100%;
-    height: 100dvh;
-    overflow: hidden;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Arial, sans-serif;
-    user-select: none;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
-button {
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
+button, input, textarea {
+  font: inherit;
 }
 
-.desktop {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background:
-        radial-gradient(ellipse at 75% 30%, #292929, transparent 40%),
-        linear-gradient(145deg, #171717, #090909);
+#desktop {
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 70% 35%,
+    #1a2b45,
+    #0a111e 55%,
+    #070a10
+  );
 }
-
-/* TOPBAR */
 
 .topbar {
-    height: 55px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #ffffff12;
-    background: #11111155;
+  height: 42px;
+  background: #070b12cc;
+  border-bottom: 1px solid #ffffff12;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .brand {
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 4px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  color: var(--text);
 }
 
-.status {
-    color: var(--muted);
-    font-size: 11px;
+.watermark {
+  position: absolute;
+  right: 5%;
+  top: 22%;
+  font-size: clamp(50px, 14vw, 150px);
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: #a8c2ff09;
+  pointer-events: none;
 }
-
-/* DESKTOP ICONS */
 
 .desktop-icons {
-    position: absolute;
-    top: 85px;
-    left: 20px;
-    display: grid;
-    grid-template-columns: repeat(2, 85px);
-    gap: 20px 10px;
+  position: absolute;
+  top: 58px;
+  left: 12px;
+  display: grid;
+  gap: 12px;
 }
 
-.icon-button {
-    width: 85px;
-    min-height: 90px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 9px;
-    border: 1px solid transparent;
-    border-radius: 12px;
-    background: transparent;
-    color: #cccccc;
-    font-size: 11px;
+.desk-icon {
+  width: 76px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 11px;
+  padding: 8px 2px;
+  border-radius: 8px;
 }
 
-.icon-button:active {
-    background: #ffffff12;
+.desk-icon:hover {
+  background: #ffffff15;
 }
 
-.glyph {
-    width: 45px;
-    height: 45px;
-    display: grid;
-    place-items: center;
-    border: 1px solid #454545;
-    border-radius: 12px;
-    background: linear-gradient(145deg, #292929, #171717);
-    font-size: 20px;
+.desk-icon b {
+  display: block;
+  font-size: 27px;
+  margin-bottom: 5px;
 }
-
-/* WALLPAPER TEXT */
-
-.wallpaper-title {
-    position: absolute;
-    right: 7%;
-    top: 40%;
-    text-align: right;
-    pointer-events: none;
-    color: #ffffff20;
-}
-
-.wallpaper-title strong {
-    display: block;
-    font-size: clamp(30px, 8vw, 75px);
-    letter-spacing: 10px;
-}
-
-.wallpaper-title span {
-    color: #ffffff55;
-    font-size: 10px;
-    letter-spacing: 4px;
-}
-
-/* TASKBAR */
 
 .taskbar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 65px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
-    border-top: 1px solid #ffffff18;
-    background: #151515ed;
-    backdrop-filter: blur(15px);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: #080d16ef;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 7px;
+  z-index: 150;
 }
 
-.task-left {
-    display: flex;
-    align-items: center;
-    gap: 9px;
+.taskbar button,
+.control {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text);
+  border-radius: 7px;
+  padding: 9px;
 }
 
-.start-button,
-.task-app {
-    min-height: 40px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: #242424;
+.taskbar button:hover,
+.taskbar button.active {
+  background: #1b293c;
+  border-color: var(--line);
 }
 
 .start-button {
-    padding: 0 15px;
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 2px;
+  color: var(--accent) !important;
+  font-weight: bold;
+  letter-spacing: 2px;
 }
 
-.task-app {
-    width: 40px;
-    font-size: 17px;
-}
+.spacer { flex: 1; }
 
 .clock {
-    text-align: right;
-    font-size: 12px;
+  text-align: right;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
 }
 
-.clock small {
-    display: block;
-    margin-top: 3px;
-    color: var(--muted);
-    font-size: 10px;
+#startMenu {
+  display: none;
+  position: absolute;
+  bottom: 65px;
+  left: 10px;
+  width: min(320px, calc(100vw - 20px));
+  padding: 14px;
+  background: #101a29;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  z-index: 200;
+  box-shadow: 0 15px 45px #0009;
 }
 
-/* START MENU */
+#startMenu.show { display: block; }
 
-.start-menu {
-    display: none;
-    position: absolute;
-    z-index: 10;
-    bottom: 75px;
-    left: 12px;
-    width: min(320px, calc(100vw - 24px));
-    padding: 18px;
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    background: #1b1b1b;
-    box-shadow: 0 15px 50px #000a;
+.menu-items {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
 }
 
-.start-menu.open {
-    display: block;
+.menu-items button {
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--text);
+  padding: 11px;
 }
 
-.menu-title {
-    margin-bottom: 15px;
-    font-size: 12px;
-    letter-spacing: 3px;
+.menu-items button:hover {
+  background: #1b293c;
+  border-color: var(--line);
 }
-
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-.menu-item {
-    min-height: 75px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    background: #292929;
-    font-size: 10px;
-}
-
-.menu-item b {
-    font-size: 20px;
-    font-weight: normal;
-}
-
-/* APPLICATION WINDOW */
 
 .window {
-    display: none;
-    position: absolute;
-    z-index: 5;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -55%);
-    width: min(500px, calc(100vw - 28px));
-    min-height: 240px;
-    overflow: hidden;
-    border: 1px solid #444;
-    border-radius: 14px;
-    background: #1b1b1b;
-    box-shadow: 0 20px 70px #000a;
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(600px, calc(100vw - 22px));
+  height: min(440px, calc(100dvh - 120px));
+  background: #101925;
+  border: 1px solid #354760;
+  border-radius: 11px;
+  box-shadow: 0 20px 60px #000b;
+  z-index: 20;
+  overflow: hidden;
+  flex-direction: column;
 }
 
-.window.open {
-    display: block;
+.window.open { display: flex; }
+
+.window.maximized {
+  inset: 48px 8px 64px;
+  width: auto;
+  height: auto;
+  transform: none;
 }
 
 .window-header {
-    height: 48px;
-    padding: 0 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #333;
-    background: #222;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 8px;
+  background: #152235;
+  border-bottom: 1px solid var(--line);
+  touch-action: none;
 }
 
 .window-title {
-    font-size: 12px;
-    font-weight: bold;
-    letter-spacing: 2px;
+  flex: 1;
+  font-weight: bold;
+  font-size: 12px;
 }
 
-.window-actions {
-    display: flex;
-    gap: 7px;
-}
-
-.window-actions button {
-    width: 28px;
-    height: 28px;
-    border: 1px solid #444;
-    border-radius: 7px;
-    background: #303030;
+.window-header button {
+  background: #1b2a3e;
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 5px;
+  width: 26px;
+  height: 25px;
 }
 
 .window-body {
-    min-height: 190px;
-    padding: 20px;
-    font-size: 13px;
-    line-height: 1.7;
+  padding: 15px;
+  overflow: auto;
+  flex: 1;
 }
 
-.window-body h2 {
-    margin-bottom: 8px;
-    font-size: 19px;
+.muted { color: var(--muted); }
+
+.note {
+  width: 100%;
+  height: calc(100% - 28px);
+  min-height: 200px;
+  resize: none;
+  background: #0a111c;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text);
+  line-height: 1.6;
+  outline: none;
 }
 
-.window-body p {
-    color: var(--muted);
+.status {
+  font-size: 11px;
+  color: var(--muted);
+  height: 25px;
 }
 
-.card {
-    margin-top: 18px;
-    padding: 14px;
-    border: 1px solid #383838;
-    border-radius: 10px;
-    background: #222;
+.calc {
+  max-width: 320px;
+  margin: auto;
 }
 
-@media (max-width: 520px) {
-    .desktop-icons {
-        left: 10px;
-        grid-template-columns: repeat(2, 75px);
-        gap: 12px 5px;
-    }
+.display {
+  width: 100%;
+  height: 58px;
+  background: #080e17;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-align: right;
+  padding: 10px;
+  font-size: 24px;
+  margin-bottom: 9px;
+}
 
-    .icon-button {
-        width: 75px;
-    }
+.keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
 
-    .wallpaper-title {
-        top: 45%;
-    }
+.keys button {
+  height: 47px;
+  background: #1a293d;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.keys button:hover { background: #2a405e; }
+.keys .equals { background: #344f80; }
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 9px;
+}
+
+.file {
+  padding: 14px 5px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #142033;
+  font-size: 12px;
+}
+
+.file strong {
+  display: block;
+  font-size: 25px;
+  margin-bottom: 7px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+  gap: 10px;
+}
+
+select, .small-button {
+  background: #1a293d;
+  color: var(--text);
+  border: 1px solid var(--line);
+  padding: 8px;
+  border-radius: 7px;
+}
+
+.small-button { margin: 5px 5px 12px 0; }
+
+@media(max-width:500px) {
+  .taskbar { height: 53px; padding: 0 5px; }
+  .window {
+    height: min(460px, calc(100dvh - 110px));
+  }
+  .desktop-icons { left: 4px; }
+  .desk-icon { width: 68px; }
 }
 </style>
 </head>
 
 <body>
 
-<main class="desktop">
+<main id="desktop">
 
-    <header class="topbar">
-        <div class="brand">SHADOW OS</div>
-        <div class="status">● SYSTEM ONLINE</div>
-    </header>
+  <div class="topbar">
+    <span class="brand">SHADOW OS <span class="muted">0.2</span></span>
+    <span id="topDate">SYSTEM ONLINE</span>
+  </div>
 
-    <section class="desktop-icons">
+  <div class="watermark">SHADOW</div>
 
-        <button class="icon-button" data-app="computer">
-            <span class="glyph">▣</span>
-            My Computer
-        </button>
+  <div class="desktop-icons">
+    <button class="desk-icon" data-app="files">
+      <b>▣</b>My Computer
+    </button>
 
-        <button class="icon-button" data-app="notes">
-            <span class="glyph">▤</span>
-            Notes
-        </button>
+    <button class="desk-icon" data-app="notes">
+      <b>▤</b>Notes
+    </button>
 
-        <button class="icon-button" data-app="settings">
-            <span class="glyph">⚙</span>
-            Settings
-        </button>
+    <button class="desk-icon" data-app="calculator">
+      <b>▦</b>Calculator
+    </button>
 
-        <button class="icon-button" data-app="about">
-            <span class="glyph">◈</span>
-            About
-        </button>
+    <button class="desk-icon" data-app="settings">
+      <b>⚙</b>Settings
+    </button>
 
-    </section>
+    <button class="desk-icon" data-app="about">
+      <b>◈</b>About
+    </button>
+  </div>
 
-    <div class="wallpaper-title">
-        <strong>SHADOW</strong>
-        <span>YOUR DIGITAL SPACE</span>
+  <div id="startMenu">
+    <div class="muted" style="margin-bottom:10px">
+      APPLICATIONS
     </div>
 
-    <section class="start-menu" id="startMenu">
-        <div class="menu-title">SHADOW MENU</div>
+    <div class="menu-items">
+      <button data-app="files">▣ File Manager</button>
+      <button data-app="notes">▤ Notes</button>
+      <button data-app="calculator">▦ Calculator</button>
+      <button data-app="settings">⚙ Settings</button>
+      <button data-app="about">◈ About</button>
+    </div>
+  </div>
 
-        <div class="menu-grid">
-            <button class="menu-item" data-app="computer">
-                <b>▣</b>Computer
-            </button>
+  <div class="taskbar">
+    <button class="start-button" id="startButton">
+      ◈ START
+    </button>
 
-            <button class="menu-item" data-app="notes">
-                <b>▤</b>Notes
-            </button>
+    <button data-app="files">▣</button>
+    <button data-app="notes">▤</button>
+    <button data-app="calculator">▦</button>
 
-            <button class="menu-item" data-app="settings">
-                <b>⚙</b>Settings
-            </button>
+    <span class="spacer"></span>
 
-            <button class="menu-item" data-app="about">
-                <b>◈</b>About
-            </button>
-        </div>
-    </section>
-
-    <section class="window" id="appWindow">
-
-        <div class="window-header">
-            <div class="window-title" id="windowTitle">
-                APPLICATION
-            </div>
-
-            <div class="window-actions">
-                <button id="minimizeBtn">−</button>
-                <button id="closeBtn">×</button>
-            </div>
-        </div>
-
-        <div class="window-body" id="windowBody"></div>
-
-    </section>
-
-    <footer class="taskbar">
-
-        <div class="task-left">
-            <button class="start-button" id="startBtn">
-                ◈ START
-            </button>
-
-            <button class="task-app" data-app="computer">▣</button>
-            <button class="task-app" data-app="notes">▤</button>
-        </div>
-
-        <div class="clock">
-            <div id="clock">00:00</div>
-            <small id="date">Loading...</small>
-        </div>
-
-    </footer>
+    <div class="clock">
+      <div id="clockTime">00:00</div>
+      <div id="clockDate">--</div>
+    </div>
+  </div>
 
 </main>
 
 <script>
-const startMenu = document.getElementById("startMenu");
-const appWindow = document.getElementById("appWindow");
-const windowTitle = document.getElementById("windowTitle");
-const windowBody = document.getElementById("windowBody");
-
 const apps = {
-    computer: {
-        title: "MY COMPUTER",
-        body: `
-            <h2>My Computer</h2>
-            <p>Virtual storage system.</p>
-            <div class="card">
-                📁 This PC<br>
-                <small>File Manager coming soon.</small>
-            </div>
-        `
-    },
-
-    notes: {
-        title: "NOTES",
-        body: `
-            <h2>Notes</h2>
-            <p>Your personal workspace.</p>
-            <div class="card">
-                📝 Notes application coming soon.
-            </div>
-        `
-    },
-
-    settings: {
-        title: "SETTINGS",
-        body: `
-            <h2>System Settings</h2>
-            <p>Customize Shadow OS.</p>
-            <div class="card">
-                ⚙ Appearance<br>
-                <small>More settings coming soon.</small>
-            </div>
-        `
-    },
-
-    about: {
-        title: "ABOUT SHADOW OS",
-        body: `
-            <h2>SHADOW OS</h2>
-            <p>Browser-based desktop environment.</p>
-            <div class="card">
-                VERSION 0.1<br>
-                BUILD 001<br>
-                STATUS: DEVELOPMENT
-            </div>
-        `
-    }
+  files: ["▣", "My Computer"],
+  notes: ["▤", "Notes"],
+  calculator: ["▦", "Calculator"],
+  settings: ["⚙", "Settings"],
+  about: ["◈", "About SHADOW OS"]
 };
 
-function openApp(name) {
-    const app = apps[name];
+let zIndex = 30;
 
-    if (!app) return;
+function appContent(id) {
 
-    windowTitle.textContent = app.title;
-    windowBody.innerHTML = app.body;
+  if (id === "notes") {
+    return `
+      <div class="status" id="savedStatus">
+        CATATAN TERSIMPAN DI BROWSER
+      </div>
 
-    startMenu.classList.remove("open");
-    appWindow.classList.add("open");
+      <textarea
+        class="note"
+        id="noteInput"
+        placeholder="Tulis catatanmu..."
+      ></textarea>
+    `;
+  }
+
+  if (id === "calculator") {
+    const keys = [
+      "AC","⌫","%","÷",
+      "7","8","9","×",
+      "4","5","6","−",
+      "1","2","3","+",
+      "±","0",".","="
+    ];
+
+    return `
+      <div class="calc">
+        <input
+          class="display"
+          id="calcDisplay"
+          value="0"
+          readonly
+        >
+
+        <div class="keys">
+          ${keys.map(key => `
+            <button
+              data-key="${key}"
+              class="${key === '=' ? 'equals' : ''}"
+            >${key}</button>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  if (id === "files") {
+    return `
+      <p class="muted">SIMULATED STORAGE</p>
+
+      <button class="small-button" id="newFolder">
+        ＋ New folder
+      </button>
+
+      <button class="small-button" id="refreshFiles">
+        ↻ Refresh
+      </button>
+
+      <div class="file-grid" id="fileGrid">
+        <div class="file"><strong>📁</strong>Documents</div>
+        <div class="file"><strong>📁</strong>Pictures</div>
+        <div class="file"><strong>📁</strong>Downloads</div>
+        <div class="file"><strong>▤</strong>Readme.txt</div>
+      </div>
+
+      <p class="muted">
+        File Manager masih simulasi dan belum mengakses
+        file asli perangkat.
+      </p>
+    `;
+  }
+
+  if (id === "settings") {
+    return `
+      <div class="row">
+        <span>Interface theme</span>
+
+        <select id="themeSelect">
+          <option value="dark">Dark</option>
+          <option value="blue">Midnight Blue</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <span>Version</span>
+        <span>0.2</span>
+      </div>
+
+      <div class="row">
+        <span>Notes storage</span>
+        <span>Local browser</span>
+      </div>
+
+      <button class="small-button" id="clearNotes">
+        Clear saved notes
+      </button>
+    `;
+  }
+
+  return `
+    <div style="text-align:center;padding:25px">
+      <div style="
+        font-size:42px;
+        color:var(--accent);
+        font-weight:900;
+        letter-spacing:8px
+      ">SHADOW</div>
+
+      <h3>OPERATING ENVIRONMENT</h3>
+
+      <p class="muted">Version 0.2 · Web Edition</p>
+
+      <p class="muted">
+        Desktop interface berbasis HTML, CSS, dan JavaScript.
+        Bukan sistem operasi sungguhan.
+      </p>
+    </div>
+  `;
 }
 
-function closeApp() {
-    appWindow.classList.remove("open");
-}
+function launchApp(id) {
 
-document.querySelectorAll("[data-app]").forEach(button => {
-    button.addEventListener("click", () => {
-        openApp(button.dataset.app);
+  if (!apps[id]) return;
+
+  document.getElementById("startMenu")
+    .classList.remove("show");
+
+  let win = document.getElementById("window-" + id);
+
+  if (!win) {
+
+    win = document.createElement("section");
+    win.className = "window";
+    win.id = "window-" + id;
+
+    win.innerHTML = `
+      <div class="window-header">
+        <span>${apps[id][0]}</span>
+
+        <span class="window-title">
+          ${apps[id][1]}
+        </span>
+
+        <button data-minimize>—</button>
+        <button data-maximize>□</button>
+        <button data-close>×</button>
+      </div>
+
+      <div class="window-body">
+        ${appContent(id)}
+      </div>
+    `;
+
+    document.getElementById("desktop")
+      .appendChild(win);
+
+    win.addEventListener("pointerdown", () => {
+      win.style.zIndex = ++zIndex;
     });
+
+    win.querySelector("[data-close]").onclick = () => {
+      win.classList.remove("open");
+    };
+
+    win.querySelector("[data-minimize]").onclick = () => {
+      win.classList.remove("open");
+    };
+
+    win.querySelector("[data-maximize]").onclick = () => {
+      win.classList.toggle("maximized");
+    };
+
+    makeDraggable(win);
+
+    if (id === "notes") setupNotes(win);
+    if (id === "calculator") setupCalculator(win);
+    if (id === "files") setupFiles(win);
+    if (id === "settings") setupSettings(win);
+  }
+
+  win.classList.add("open");
+  win.style.zIndex = ++zIndex;
+}
+
+function setupNotes(win) {
+
+  const input = win.querySelector("#noteInput");
+  const status = win.querySelector("#savedStatus");
+
+  input.value = localStorage.getItem("shadow_notes") || "";
+
+  input.addEventListener("input", () => {
+
+    localStorage.setItem("shadow_notes", input.value);
+
+    status.textContent = "SAVING...";
+
+    clearTimeout(input.saveTimer);
+
+    input.saveTimer = setTimeout(() => {
+      status.textContent = "SAVED LOCALLY";
+    }, 350);
+
+  });
+}
+
+function setupCalculator(win) {
+
+  const display = win.querySelector("#calcDisplay");
+
+  let expression = "";
+
+  win.querySelectorAll("[data-key]").forEach(button => {
+
+    button.onclick = () => {
+
+      const key = button.dataset.key;
+
+      if (key === "AC") {
+        expression = "";
+        display.value = "0";
+        return;
+      }
+
+      if (key === "⌫") {
+        expression = expression.slice(0, -1);
+        display.value = expression || "0";
+        return;
+      }
+
+      if (key === "±") {
+        expression = expression.startsWith("-")
+          ? expression.slice(1)
+          : "-" + expression;
+
+        display.value = expression || "0";
+        return;
+      }
+
+      if (key === "=") {
+
+        try {
+
+          const safe = expression
+            .replace(/×/g, "*")
+            .replace(/÷/g, "/")
+            .replace(/−/g, "-");
+
+          if (!/^[0-9+\-*/%.() ]+$/.test(safe)) {
+            throw new Error("Invalid");
+          }
+
+          const result = Function(
+            '"use strict";return (' + safe + ')'
+          )();
+
+          if (!Number.isFinite(result)) {
+            throw new Error("Invalid result");
+          }
+
+          expression = String(
+            Number(result.toFixed(8))
+          );
+
+          display.value = expression;
+
+        } catch {
+          expression = "";
+          display.value = "Error";
+        }
+
+        return;
+      }
+
+      expression += ({
+        "×": "*",
+        "÷": "/",
+        "−": "-"
+      }[key] || key);
+
+      display.value = expression
+        .replace(/\*/g, "×")
+        .replace(/\//g, "÷")
+        .replace(/-/g, "−");
+
+    };
+
+  });
+}
+
+function setupFiles(win) {
+
+  win.querySelector("#newFolder").onclick = () => {
+
+    const name = prompt("Nama folder baru:");
+
+    if (!name) return;
+
+    const folder = document.createElement("div");
+    folder.className = "file";
+
+    const icon = document.createElement("strong");
+    icon.textContent = "📁";
+
+    folder.append(icon, document.createTextNode(name));
+
+    win.querySelector("#fileGrid").appendChild(folder);
+  };
+
+  win.querySelector("#refreshFiles").onclick = () => {
+    alert("Tampilan diperbarui.");
+  };
+}
+
+function setupSettings(win) {
+
+  const theme = win.querySelector("#themeSelect");
+
+  theme.value = localStorage.getItem("shadow_theme") || "dark";
+
+  theme.onchange = () => {
+    document.documentElement.dataset.theme = theme.value;
+    localStorage.setItem("shadow_theme", theme.value);
+  };
+
+  win.querySelector("#clearNotes").onclick = () => {
+
+    if (confirm("Hapus semua catatan tersimpan?")) {
+      localStorage.removeItem("shadow_notes");
+      alert("Catatan dihapus.");
+    }
+
+  };
+}
+
+function makeDraggable(win) {
+
+  const header = win.querySelector(".window-header");
+
+  let startX, startY, left, top, dragging = false;
+
+  header.addEventListener("pointerdown", event => {
+
+    if (
+      event.target.closest("button") ||
+      win.classList.contains("maximized")
+    ) return;
+
+    const rect = win.getBoundingClientRect();
+
+    startX = event.clientX;
+    startY = event.clientY;
+    left = rect.left;
+    top = rect.top;
+
+    dragging = true;
+    header.setPointerCapture(event.pointerId);
+  });
+
+  header.addEventListener("pointermove", event => {
+
+    if (!dragging) return;
+
+    const x = Math.max(
+      0,
+      Math.min(innerWidth - win.offsetWidth,
+        left + event.clientX - startX)
+    );
+
+    const y = Math.max(
+      42,
+      Math.min(innerHeight - 80,
+        top + event.clientY - startY)
+    );
+
+    win.style.left = x + "px";
+    win.style.top = y + "px";
+    win.style.transform = "none";
+  });
+
+  header.addEventListener("pointerup", () => {
+    dragging = false;
+  });
+
+  header.addEventListener("pointercancel", () => {
+    dragging = false;
+  });
+}
+
+document.addEventListener("click", event => {
+
+  const appButton = event.target.closest("[data-app]");
+
+  if (appButton) {
+    launchApp(appButton.dataset.app);
+  }
+
 });
 
-document.getElementById("startBtn").addEventListener("click", () => {
-    startMenu.classList.toggle("open");
-    appWindow.classList.remove("open");
-});
+document.getElementById("startButton").onclick = () => {
+  document.getElementById("startMenu")
+    .classList.toggle("show");
+};
 
-document.getElementById("closeBtn").addEventListener("click", closeApp);
-document.getElementById("minimizeBtn").addEventListener("click", closeApp);
+document.addEventListener("click", event => {
+
+  if (
+    !event.target.closest("#startMenu") &&
+    !event.target.closest("#startButton")
+  ) {
+    document.getElementById("startMenu")
+      .classList.remove("show");
+  }
+
+});
 
 function updateClock() {
-    const now = new Date();
 
-    document.getElementById("clock").textContent =
-        now.toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit"
-        });
+  const now = new Date();
 
-    document.getElementById("date").textContent =
-        now.toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
+  document.getElementById("clockTime").textContent =
+    now.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+  document.getElementById("clockDate").textContent =
+    now.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+
+  document.getElementById("topDate").textContent =
+    now.toLocaleDateString("id-ID", {
+      weekday: "short",
+      day: "numeric",
+      month: "short"
+    });
+
 }
 
 updateClock();
 setInterval(updateClock, 1000);
+
+if (localStorage.getItem("shadow_theme") === "blue") {
+  document.documentElement.dataset.theme = "blue";
+}
+
 </script>
+
+<style>
+:root[data-theme="blue"] {
+  --bg: #050b18;
+  --line: #263d5e;
+  --accent: #73c9ff;
+}
+</style>
 
 </body>
 </html>
